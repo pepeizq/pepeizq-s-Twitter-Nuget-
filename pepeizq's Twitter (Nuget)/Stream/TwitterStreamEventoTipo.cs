@@ -52,6 +52,9 @@ namespace pepeizq.Twitter.Stream
         AccessRevoked,
 
         [EnumMemberAttribute(Value = "quoted_tweet")]
-        QuotedTweet
+        QuotedTweet,
+
+        [EnumMemberAttribute(Value = "retweeted_retweet")]
+        RetweetTweet
     }
 }
