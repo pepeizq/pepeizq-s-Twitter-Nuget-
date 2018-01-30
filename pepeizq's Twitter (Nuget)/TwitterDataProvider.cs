@@ -298,6 +298,37 @@ namespace pepeizq.Twitter
             }
         }
 
+        public async Task<bool> DeshacerRetweetStatusAsync(TwitterStatus status)
+        {
+            try
+            {
+                var uri = new Uri($"{BaseUrl}/statuses/unretweet/{status.TweetID}.json");
+
+                TwitterOAuthRequest request = new TwitterOAuthRequest();
+                await request.EjecutarPostAsync(uri, _tokens);
+
+                return true;
+            }
+            catch (WebException wex)
+            {
+                HttpWebResponse response = wex.Response as HttpWebResponse;
+                if (response != null)
+                {
+                    if ((int)response.StatusCode == 429)
+                    {
+                        throw new TooManyRequestsException();
+                    }
+
+                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        throw new OAuthKeysRevokedException();
+                    }
+                }
+
+                throw;
+            }
+        }
+
         public async Task<bool> TweetStatusAsync(string tweet, params IRandomAccessStream[] imagenes)
         {
             return await TweetStatusAsync(new TwitterStatus { Mensaje = tweet }, imagenes);

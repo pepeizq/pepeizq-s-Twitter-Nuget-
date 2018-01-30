@@ -187,6 +187,22 @@ namespace pepeizq.Twitter
             return false;
         }
 
+        public async Task<bool> DeshacerRetweetStatusAsync(TwitterStatus status)
+        {
+            if (Provider.LoggedIn)
+            {
+                return await Provider.DeshacerRetweetStatusAsync(status);
+            }
+
+            var isLoggedIn = await LoginAsync();
+            if (isLoggedIn)
+            {
+                return await DeshacerRetweetStatusAsync(status);
+            }
+
+            return false;
+        }
+
         public async Task<bool> TweetStatusAsync(string mensaje, params IRandomAccessStream[] pictures)
         {
             return await TweetStatusAsync(new TwitterStatus { Mensaje = mensaje }, pictures);
