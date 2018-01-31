@@ -267,7 +267,71 @@ namespace pepeizq.Twitter
             LoggedIn = false;
         }
 
-        public async Task<bool> RetweetStatusAsync(TwitterStatus status)
+        //--------------------------------------------
+
+        public async Task<bool> Favoritear(TwitterStatus status)
+        {
+            try
+            {
+                var uri = new Uri($"{BaseUrl}/favorites/create.json?id={status.TweetID}");
+
+                TwitterOAuthRequest request = new TwitterOAuthRequest();
+                await request.EjecutarPostAsync(uri, _tokens);
+
+                return true;
+            }
+            catch (WebException wex)
+            {
+                HttpWebResponse response = wex.Response as HttpWebResponse;
+                if (response != null)
+                {
+                    if ((int)response.StatusCode == 429)
+                    {
+                        throw new TooManyRequestsException();
+                    }
+
+                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        throw new OAuthKeysRevokedException();
+                    }
+                }
+
+                throw;
+            }
+        }
+
+        public async Task<bool> DeshacerFavorito(TwitterStatus status)
+        {
+            try
+            {
+                var uri = new Uri($"{BaseUrl}/favorites/destroy.json?id={status.TweetID}");
+
+                TwitterOAuthRequest request = new TwitterOAuthRequest();
+                await request.EjecutarPostAsync(uri, _tokens);
+
+                return true;
+            }
+            catch (WebException wex)
+            {
+                HttpWebResponse response = wex.Response as HttpWebResponse;
+                if (response != null)
+                {
+                    if ((int)response.StatusCode == 429)
+                    {
+                        throw new TooManyRequestsException();
+                    }
+
+                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        throw new OAuthKeysRevokedException();
+                    }
+                }
+
+                throw;
+            }
+        }
+
+        public async Task<bool> Retwitear(TwitterStatus status)
         {
             try
             {
@@ -298,7 +362,7 @@ namespace pepeizq.Twitter
             }
         }
 
-        public async Task<bool> DeshacerRetweetStatusAsync(TwitterStatus status)
+        public async Task<bool> DeshacerRetweet(TwitterStatus status)
         {
             try
             {
@@ -329,12 +393,12 @@ namespace pepeizq.Twitter
             }
         }
 
-        public async Task<bool> TweetStatusAsync(string tweet, params IRandomAccessStream[] imagenes)
+        public async Task<bool> EnviarTweet(string tweet, params IRandomAccessStream[] imagenes)
         {
-            return await TweetStatusAsync(new TwitterStatus { Mensaje = tweet }, imagenes);
+            return await EnviarTweet(new TwitterStatus { Mensaje = tweet }, imagenes);
         }
 
-        public async Task<bool> TweetStatusAsync(TwitterStatus status, params IRandomAccessStream[] imagenes)
+        public async Task<bool> EnviarTweet(TwitterStatus status, params IRandomAccessStream[] imagenes)
         {
             try
             {
@@ -378,7 +442,7 @@ namespace pepeizq.Twitter
             }
         }
 
-        public Task StartUserStreamAsync(TwitterUsuarioStreamParser parser, TwitterStreamLlamadas.TwitterStreamLlamada llamada)
+        public Task ArrancarStreamUsuario(TwitterUsuarioStreamParser parser, TwitterStreamLlamadas.TwitterStreamLlamada llamada)
         {
             try
             {
@@ -408,7 +472,7 @@ namespace pepeizq.Twitter
             }
         }
 
-        public void StopStream()
+        public void PararStreamUsuario()
         {
             _streamRequest?.Abortar();
             _streamRequest = null;
@@ -429,6 +493,8 @@ namespace pepeizq.Twitter
             TwitterOAuthRequest request = new TwitterOAuthRequest();
             return await request.ExecutePostMultipartAsync(uri, _tokens, boundary, fileBytes);
         }
+
+        //--------------------------------------------
 
         protected override IParser<SchemaBase> GetDefaultParser(TwitterDataConfig config)
         {

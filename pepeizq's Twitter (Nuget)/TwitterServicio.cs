@@ -171,44 +171,78 @@ namespace pepeizq.Twitter
             Provider.Logout();
         }
 
-        public async Task<bool> RetweetStatusAsync(TwitterStatus status)
+        //--------------------------------------------
+
+        public async Task<bool> Favoritear(TwitterStatus status)
         {
             if (Provider.LoggedIn)
             {
-                return await Provider.RetweetStatusAsync(status);
+                return await Provider.Favoritear(status);
             }
 
             var isLoggedIn = await LoginAsync();
             if (isLoggedIn)
             {
-                return await RetweetStatusAsync(status);
+                return await Favoritear(status);
             }
 
             return false;
         }
 
-        public async Task<bool> DeshacerRetweetStatusAsync(TwitterStatus status)
+        public async Task<bool> DeshacerFavorito(TwitterStatus status)
         {
             if (Provider.LoggedIn)
             {
-                return await Provider.DeshacerRetweetStatusAsync(status);
+                return await Provider.DeshacerFavorito(status);
             }
 
             var isLoggedIn = await LoginAsync();
             if (isLoggedIn)
             {
-                return await DeshacerRetweetStatusAsync(status);
+                return await DeshacerFavorito(status);
             }
 
             return false;
         }
 
-        public async Task<bool> TweetStatusAsync(string mensaje, params IRandomAccessStream[] pictures)
+        public async Task<bool> Retwitear(TwitterStatus status)
         {
-            return await TweetStatusAsync(new TwitterStatus { Mensaje = mensaje }, pictures);
+            if (Provider.LoggedIn)
+            {
+                return await Provider.Retwitear(status);
+            }
+
+            var isLoggedIn = await LoginAsync();
+            if (isLoggedIn)
+            {
+                return await Retwitear(status);
+            }
+
+            return false;
         }
 
-        public async Task<bool> TweetStatusAsync(TwitterStatus status, params IRandomAccessStream[] pictures)
+        public async Task<bool> DeshacerRetweet(TwitterStatus status)
+        {
+            if (Provider.LoggedIn)
+            {
+                return await Provider.DeshacerRetweet(status);
+            }
+
+            var isLoggedIn = await LoginAsync();
+            if (isLoggedIn)
+            {
+                return await DeshacerRetweet(status);
+            }
+
+            return false;
+        }
+
+        public async Task<bool> EnviarTweet(string mensaje, params IRandomAccessStream[] pictures)
+        {
+            return await EnviarTweet(new TwitterStatus { Mensaje = mensaje }, pictures);
+        }
+
+        public async Task<bool> EnviarTweet(TwitterStatus status, params IRandomAccessStream[] pictures)
         {
             if (pictures.Length > 4)
             {
@@ -217,36 +251,36 @@ namespace pepeizq.Twitter
 
             if (Provider.LoggedIn)
             {
-                return await Provider.TweetStatusAsync(status, pictures);
+                return await Provider.EnviarTweet(status, pictures);
             }
 
             var isLoggedIn = await LoginAsync();
             if (isLoggedIn)
             {
-                return await TweetStatusAsync(status, pictures);
+                return await EnviarTweet(status, pictures);
             }
 
             return false;
         }
 
-        public async Task StartUserStreamAsync(TwitterStreamLlamadas.TwitterStreamLlamada llamada)
+        public async Task ArrancarStreamUsuario(TwitterStreamLlamadas.TwitterStreamLlamada llamada)
         {
             if (Provider.LoggedIn)
             {
-                await Provider.StartUserStreamAsync(new TwitterUsuarioStreamParser(), llamada);
+                await Provider.ArrancarStreamUsuario(new TwitterUsuarioStreamParser(), llamada);
                 return;
             }
 
             var isLoggedIn = await LoginAsync();
             if (isLoggedIn)
             {
-                await StartUserStreamAsync(llamada);
+                await ArrancarStreamUsuario(llamada);
             }
         }
 
-        public void StopUserStream()
+        public void PararStreamUsuario()
         {
-            Provider.StopStream();
+            Provider.PararStreamUsuario();
         }
     }
 }
