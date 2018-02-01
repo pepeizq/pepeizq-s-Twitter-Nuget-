@@ -55,6 +55,9 @@ namespace pepeizq.Twitter.Stream
         QuotedTweet,
 
         [EnumMemberAttribute(Value = "retweeted_retweet")]
-        RetweetTweet
+        RetweetTweet,
+
+        [EnumMemberAttribute(Value = "favorited_retweet")]
+        FavoritedTweet
     }
 }
