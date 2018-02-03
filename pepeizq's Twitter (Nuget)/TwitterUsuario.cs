@@ -23,7 +23,7 @@ namespace pepeizq.Twitter
         public bool Verificado { get; set; }
 
         [JsonProperty("following")]
-        public bool Siguiendo { get; set; }
+        public string Siguiendo { get; set; }
 
         [JsonProperty("created_at")]
         public string Creacion { get; set; }

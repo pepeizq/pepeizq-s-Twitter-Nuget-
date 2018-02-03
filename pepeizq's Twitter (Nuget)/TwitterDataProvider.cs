@@ -102,58 +102,7 @@ namespace pepeizq.Twitter
             }
         }
 
-        public async Task<IEnumerable<TSchema>> GetUserTimeLineAsync<TSchema>(string screenName, int maxRecords, IParser<TSchema> parser)
-            where TSchema : SchemaBase
-        {
-            string rawResult = null;
-            try
-            {
-                var uri = new Uri($"{BaseUrl}/statuses/user_timeline.json?screen_name={screenName}&count={maxRecords}&include_rts=1");
-
-                TwitterOAuthRequest request = new TwitterOAuthRequest();
-                rawResult = await request.EjecutarGetAsync(uri, _tokens);
-
-                var result = parser.Parse(rawResult);
-                return result
-                        .Take(maxRecords)
-                        .ToList();
-            }
-            catch (WebException wex)
-            {
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                if (response != null)
-                {
-                    if (response.StatusCode == HttpStatusCode.NotFound)
-                    {
-                        throw new UserNotFoundException(screenName);
-                    }
-
-                    if ((int)response.StatusCode == 429)
-                    {
-                        throw new TooManyRequestsException();
-                    }
-
-                    if (response.StatusCode == HttpStatusCode.Unauthorized)
-                    {
-                        throw new OAuthKeysRevokedException();
-                    }
-                }
-
-                throw;
-            }
-            catch
-            {
-                if (!string.IsNullOrEmpty(rawResult))
-                {
-                    var errores = JsonConvert.DeserializeObject<TwitterErrores>(rawResult);
-
-                    throw new TwitterExcepcion { Errores = errores };
-                }
-
-                throw;
-            }
-        }
-
+       
         public async Task<IEnumerable<TSchema>> SearchAsync<TSchema>(string hashTag, int maxRecords, IParser<TSchema> parser)
             where TSchema : SchemaBase
         {
@@ -268,6 +217,120 @@ namespace pepeizq.Twitter
         }
 
         //--------------------------------------------
+
+        public async Task<IEnumerable<TSchema>> CogerTweetsTimelineInicio<TSchema>(string ultimoTweet, IParser<TSchema> parser)
+        where TSchema : SchemaBase
+        {
+            try
+            {
+                if (ultimoTweet != string.Empty)
+                {
+                    ultimoTweet = "&max_id=" + ultimoTweet;
+                }
+
+                var uri = new Uri($"{BaseUrl}/statuses/home_timeline.json?tweet_mode=extended{ultimoTweet}");
+
+                TwitterOAuthRequest request = new TwitterOAuthRequest();
+                var rawResult = await request.EjecutarGetAsync(uri, _tokens);
+
+                return parser.Parse(rawResult);
+            }
+            catch (WebException wex)
+            {
+                HttpWebResponse response = wex.Response as HttpWebResponse;
+                if (response != null)
+                {
+                    if ((int)response.StatusCode == 429)
+                    {
+                        throw new TooManyRequestsException();
+                    }
+
+                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        throw new OAuthKeysRevokedException();
+                    }
+                }
+
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<TSchema>> CogerTweetsTimelineMenciones<TSchema>(string ultimoTweet, IParser<TSchema> parser)
+        where TSchema : SchemaBase
+        {
+            try
+            {
+                if (ultimoTweet != string.Empty)
+                {
+                    ultimoTweet = "&max_id=" + ultimoTweet;
+                }
+
+                var uri = new Uri($"{BaseUrl}/statuses/mentions_timeline.json?tweet_mode=extended{ultimoTweet}");
+
+                TwitterOAuthRequest request = new TwitterOAuthRequest();
+                var rawResult = await request.EjecutarGetAsync(uri, _tokens);
+
+                return parser.Parse(rawResult);
+            }
+            catch (WebException wex)
+            {
+                HttpWebResponse response = wex.Response as HttpWebResponse;
+                if (response != null)
+                {
+                    if ((int)response.StatusCode == 429)
+                    {
+                        throw new TooManyRequestsException();
+                    }
+
+                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        throw new OAuthKeysRevokedException();
+                    }
+                }
+
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<TSchema>> CogerTweetsTimelineUsuario<TSchema>(string screenNombre, string ultimoTweet, IParser<TSchema> parser)
+        where TSchema : SchemaBase
+        {
+            try
+            {
+                if (ultimoTweet != string.Empty)
+                {
+                    ultimoTweet = "&max_id=" + ultimoTweet;
+                }
+
+                var uri = new Uri($"{BaseUrl}/statuses/user_timeline.json?screen_name={screenNombre}&tweet_mode=extended&include_rts=1{ultimoTweet}");
+
+                TwitterOAuthRequest request = new TwitterOAuthRequest();
+
+                string rawResultado = null;
+                rawResultado = await request.EjecutarGetAsync(uri, _tokens);
+
+                var resultado = parser.Parse(rawResultado);
+                return resultado.Take(20).ToList();
+            }
+            catch (WebException wex)
+            {
+                HttpWebResponse response = wex.Response as HttpWebResponse;
+                if (response != null)
+                {
+                    if ((int)response.StatusCode == 429)
+                    {
+                        throw new TooManyRequestsException();
+                    }
+
+                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        throw new OAuthKeysRevokedException();
+                    }
+                }
+
+                throw;
+            }
+        }
 
         public async Task<bool> Favoritear(TwitterStatus status)
         {
@@ -522,8 +585,6 @@ namespace pepeizq.Twitter
             switch (config.QueryTipo)
             {
                 case TwitterQueryTipo.User:
-                    items = await GetUserTimeLineAsync(config.Query, maxRecords, parser);
-                    break;
                 case TwitterQueryTipo.Search:
                     items = await SearchAsync(config.Query, maxRecords, parser);
                     break;
@@ -532,7 +593,7 @@ namespace pepeizq.Twitter
                     items = await GetCustomSearch(config.Query, parser);
                     break;
                 default:
-                    items = await GetHomeTimeLineAsync(maxRecords, parser);
+                    items = null;
                     break;
             }
 
@@ -611,37 +672,7 @@ namespace pepeizq.Twitter
             return string.Empty;
         }
 
-        private async Task<IEnumerable<TSchema>> GetHomeTimeLineAsync<TSchema>(int maxRecords, IParser<TSchema> parser)
-            where TSchema : SchemaBase
-        {
-            try
-            {
-                var uri = new Uri($"{BaseUrl}/statuses/home_timeline.json?count={maxRecords}");
-
-                TwitterOAuthRequest request = new TwitterOAuthRequest();
-                var rawResult = await request.EjecutarGetAsync(uri, _tokens);
-
-                return parser.Parse(rawResult);
-            }
-            catch (WebException wex)
-            {
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                if (response != null)
-                {
-                    if ((int)response.StatusCode == 429)
-                    {
-                        throw new TooManyRequestsException();
-                    }
-
-                    if (response.StatusCode == HttpStatusCode.Unauthorized)
-                    {
-                        throw new OAuthKeysRevokedException();
-                    }
-                }
-
-                throw;
-            }
-        }
+       
 
         private async Task<IEnumerable<TSchema>> GetCustomSearch<TSchema>(string query, IParser<TSchema> parser)
             where TSchema : SchemaBase

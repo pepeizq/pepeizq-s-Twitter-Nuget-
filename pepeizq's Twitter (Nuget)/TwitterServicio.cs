@@ -114,21 +114,7 @@ namespace pepeizq.Twitter
             return null;
         }
 
-        public async Task<IEnumerable<Tweet.Tweet>> GetUserTimeLineAsync(string screenName, int maxRecords = 20)
-        {
-            if (Provider.LoggedIn)
-            {
-                return await Provider.GetUserTimeLineAsync(screenName, maxRecords, new TweetParser());
-            }
-
-            var isLoggedIn = await LoginAsync();
-            if (isLoggedIn)
-            {
-                return await GetUserTimeLineAsync(screenName, maxRecords);
-            }
-
-            return null;
-        }
+       
 
         public async Task<List<Tweet.Tweet>> RequestAsync(TwitterDataConfig config, int maxRecords = 20)
         {
@@ -172,6 +158,54 @@ namespace pepeizq.Twitter
         }
 
         //--------------------------------------------
+
+        public async Task<IEnumerable<Tweet.Tweet>> CogerTweetsTimelineInicio(string ultimoTweet)
+        {
+            if (Provider.LoggedIn)
+            {
+                return await Provider.CogerTweetsTimelineInicio(ultimoTweet, new TweetParser());
+            }
+
+            var isLoggedIn = await LoginAsync();
+            if (isLoggedIn)
+            {
+                return await CogerTweetsTimelineInicio(ultimoTweet);
+            }
+
+            return null;
+        }
+
+        public async Task<IEnumerable<Tweet.Tweet>> CogerTweetsTimelineMenciones(string ultimoTweet)
+        {
+            if (Provider.LoggedIn)
+            {
+                return await Provider.CogerTweetsTimelineMenciones(ultimoTweet, new TweetParser());
+            }
+
+            var isLoggedIn = await LoginAsync();
+            if (isLoggedIn)
+            {
+                return await CogerTweetsTimelineMenciones(ultimoTweet);
+            }
+
+            return null;
+        }
+
+        public async Task<IEnumerable<Tweet.Tweet>> CogerTweetsTimelineUsuario(string screenNombre, string ultimoTweet)
+        {
+            if (Provider.LoggedIn)
+            {
+                return await Provider.CogerTweetsTimelineUsuario(screenNombre, ultimoTweet, new TweetParser());
+            }
+
+            var isLoggedIn = await LoginAsync();
+            if (isLoggedIn)
+            {
+                return await CogerTweetsTimelineUsuario(screenNombre, ultimoTweet);
+            }
+
+            return null;
+        }
 
         public async Task<bool> Favoritear(TwitterStatus status)
         {
