@@ -2,9 +2,10 @@
 {
     public enum TwitterQueryTipo
     {
-        Home,
-        User,
-        Search,
-        Custom
+        Inicio,
+        Usuario,
+        Busqueda,
+        Banner,
+        Personalizada
     }
 }

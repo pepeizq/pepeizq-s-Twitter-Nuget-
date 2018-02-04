@@ -106,6 +106,10 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Banner\Banner.cs" />
+    <Compile Include="Banner\BannerImagen.cs" />
+    <Compile Include="Banner\BannerParser.cs" />
+    <Compile Include="Banner\BannerTamaño.cs" />
     <Compile Include="ITwitterResultado.cs" />
     <Compile Include="OAuth\OAuthEncoder.cs" />
     <Compile Include="OAuth\OAuthParametro.cs" />

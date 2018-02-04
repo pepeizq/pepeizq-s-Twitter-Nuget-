@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.Toolkit.Services;
 using Microsoft.Toolkit.Services.Exceptions;
 using Newtonsoft.Json;
+using pepeizq.Twitter.Banner;
 using pepeizq.Twitter.OAuth;
 using pepeizq.Twitter.Stream;
 using pepeizq.Twitter.Tweet;
@@ -223,7 +224,7 @@ namespace pepeizq.Twitter
         {
             try
             {
-                if (ultimoTweet != string.Empty)
+                if (ultimoTweet != null)
                 {
                     ultimoTweet = "&max_id=" + ultimoTweet;
                 }
@@ -260,7 +261,7 @@ namespace pepeizq.Twitter
         {
             try
             {
-                if (ultimoTweet != string.Empty)
+                if (ultimoTweet != null)
                 {
                     ultimoTweet = "&max_id=" + ultimoTweet;
                 }
@@ -297,7 +298,7 @@ namespace pepeizq.Twitter
         {
             try
             {
-                if (ultimoTweet != string.Empty)
+                if (ultimoTweet != null)
                 {
                     ultimoTweet = "&max_id=" + ultimoTweet;
                 }
@@ -311,6 +312,40 @@ namespace pepeizq.Twitter
 
                 var resultado = parser.Parse(rawResultado);
                 return resultado.Take(20).ToList();
+            }
+            catch (WebException wex)
+            {
+                HttpWebResponse response = wex.Response as HttpWebResponse;
+                if (response != null)
+                {
+                    if ((int)response.StatusCode == 429)
+                    {
+                        throw new TooManyRequestsException();
+                    }
+
+                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        throw new OAuthKeysRevokedException();
+                    }
+                }
+
+                throw;
+            }
+        }
+
+        public async Task<Banner.Banner> CogerBannerUsuario(string screenNombre, BannerParser parser)
+        {
+            try
+            {
+                var uri = new Uri($"{BaseUrl}/users/profile_banner.json?screen_name={screenNombre}");
+
+                TwitterOAuthRequest request = new TwitterOAuthRequest();
+
+                string rawResultado = null;
+                rawResultado = await request.EjecutarGetAsync(uri, _tokens);
+
+                var resultado = parser.Parse(rawResultado);
+                return resultado;
             }
             catch (WebException wex)
             {
@@ -568,11 +603,12 @@ namespace pepeizq.Twitter
 
             switch (config.QueryTipo)
             {
-                case TwitterQueryTipo.Search:
+                case TwitterQueryTipo.Busqueda:
                     return new TwitterSearchParser();
-                case TwitterQueryTipo.Home:
-                case TwitterQueryTipo.User:
-                case TwitterQueryTipo.Custom:
+                case TwitterQueryTipo.Inicio:
+                case TwitterQueryTipo.Usuario:
+                case TwitterQueryTipo.Banner:
+                case TwitterQueryTipo.Personalizada:
                     return new TwitterParser<SchemaBase>();
                 default:
                     return new TwitterParser<SchemaBase>();
@@ -584,16 +620,17 @@ namespace pepeizq.Twitter
             IEnumerable<TSchema> items;
             switch (config.QueryTipo)
             {
-                case TwitterQueryTipo.User:
-                case TwitterQueryTipo.Search:
+                case TwitterQueryTipo.Usuario:
+                case TwitterQueryTipo.Busqueda:
                     items = await SearchAsync(config.Query, maxRecords, parser);
                     break;
-                case TwitterQueryTipo.Home:
-                case TwitterQueryTipo.Custom:
+                case TwitterQueryTipo.Inicio:
+                case TwitterQueryTipo.Banner:
+                case TwitterQueryTipo.Personalizada:
                     items = await GetCustomSearch(config.Query, parser);
                     break;
                 default:
-                    items = null;
+                    items = await CogerTweetsTimelineInicio(null, parser);
                     break;
             }
 
@@ -602,7 +639,7 @@ namespace pepeizq.Twitter
 
         protected override void ValidateConfig(TwitterDataConfig config)
         {
-            if (config?.Query == null && config?.QueryTipo != TwitterQueryTipo.Home)
+            if (config?.Query == null && config?.QueryTipo != TwitterQueryTipo.Inicio)
             {
                 throw new ConfigParameterNullException(nameof(config.Query));
             }

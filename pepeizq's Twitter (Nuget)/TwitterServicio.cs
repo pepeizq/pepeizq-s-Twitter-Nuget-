@@ -1,4 +1,5 @@
 ﻿using Microsoft.Toolkit.Services;
+using pepeizq.Twitter.Banner;
 using pepeizq.Twitter.OAuth;
 using pepeizq.Twitter.Stream;
 using pepeizq.Twitter.Tweet;
@@ -202,6 +203,22 @@ namespace pepeizq.Twitter
             if (isLoggedIn)
             {
                 return await CogerTweetsTimelineUsuario(screenNombre, ultimoTweet);
+            }
+
+            return null;
+        }
+
+        public async Task<Banner.Banner> CogerBannerUsuario(string screenNombre)
+        {
+            if (Provider.LoggedIn)
+            {
+                return await Provider.CogerBannerUsuario(screenNombre, new BannerParser());
+            }
+
+            var isLoggedIn = await LoginAsync();
+            if (isLoggedIn)
+            {
+                return await CogerBannerUsuario(screenNombre);
             }
 
             return null;
