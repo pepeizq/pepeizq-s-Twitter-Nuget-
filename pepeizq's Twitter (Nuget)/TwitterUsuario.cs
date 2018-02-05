@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using pepeizq.Twitter.OAuth;
 
 namespace pepeizq.Twitter
 {
@@ -63,5 +64,7 @@ namespace pepeizq.Twitter
 
         [JsonProperty("url")]
         public string Enlace { get; set; }
+
+        public TwitterOAuthTokens Tokens { get; set; }
     }
 }

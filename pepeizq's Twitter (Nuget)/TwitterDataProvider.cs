@@ -34,7 +34,7 @@ namespace pepeizq.Twitter
 
         private readonly TwitterOAuthTokens _tokens;
 
-        private readonly PasswordVault _vault;
+        private readonly PasswordVault boveda;
 
         private TwitterOAuthRequest _streamRequest;
 
@@ -45,7 +45,7 @@ namespace pepeizq.Twitter
         public TwitterDataProvider(TwitterOAuthTokens tokens)
         {
             _tokens = tokens;
-            _vault = new PasswordVault();
+            boveda = new PasswordVault();
 
             if (_client == null)
             {
@@ -55,53 +55,7 @@ namespace pepeizq.Twitter
             }
         }
 
-        public async Task<TwitterUsuario> GetUserAsync(string screenName = null)
-        {
-            string rawResultado = null;
-            try
-            {
-                var userScreenName = screenName ?? UserScreenName;
-                var uri = new Uri($"{BaseUrl}/users/show.json?screen_name={userScreenName}");
-
-                TwitterOAuthRequest request = new TwitterOAuthRequest();
-                rawResultado = await request.EjecutarGetAsync(uri, _tokens);
-                return JsonConvert.DeserializeObject<TwitterUsuario>(rawResultado);
-            }
-            catch (WebException wex)
-            {
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                if (response != null)
-                {
-                    if (response.StatusCode == HttpStatusCode.NotFound)
-                    {
-                        throw new UserNotFoundException(screenName);
-                    }
-
-                    if ((int)response.StatusCode == 429)
-                    {
-                        throw new TooManyRequestsException();
-                    }
-
-                    if (response.StatusCode == HttpStatusCode.Unauthorized)
-                    {
-                        throw new OAuthKeysRevokedException();
-                    }
-                }
-
-                throw;
-            }
-            catch
-            {
-                if (!string.IsNullOrEmpty(rawResultado))
-                {
-                    var errores = JsonConvert.DeserializeObject<TwitterErrores>(rawResultado);
-
-                    throw new TwitterExcepcion { Errores = errores };
-                }
-
-                throw;
-            }
-        }
+        
 
        
         public async Task<IEnumerable<TSchema>> SearchAsync<TSchema>(string hashTag, int maxRecords, IParser<TSchema> parser)
@@ -142,31 +96,35 @@ namespace pepeizq.Twitter
         {
             get
             {
-                if (ApplicationData.Current.LocalSettings.Values["TwitterScreenName"] == null)
-                {
-                    return null;
-                }
+                //if (ApplicationData.Current.LocalSettings.Values["TwitterScreenName"] == null)
+                //{
+                //    return null;
+                //}
 
-                var passwordCredentials = _vault.RetrieveAll();
-                var temp = passwordCredentials.FirstOrDefault(c => c.Resource == "TwitterAccessToken");
+                var passwordCredentials = boveda.RetrieveAll();
+                string usuario = UserScreenName;
+
+                var temp = passwordCredentials.FirstOrDefault(c => c.Resource == usuario);
 
                 if (temp == null)
                 {
                     return null;
                 }
 
-                return _vault.Retrieve(temp.Resource, temp.UserName);
+                return boveda.Retrieve(temp.Resource, temp.UserName);
             }
         }
 
         public async Task<bool> LoginAsync()
         {
+            UserScreenName = (string)ApplicationData.Current.LocalSettings.Values["TwitterScreenNombre"];
+
             var twitterCredentials = PasswordCredential;
             if (twitterCredentials != null)
             {
                 _tokens.AccessToken = twitterCredentials.UserName;
                 _tokens.AccessTokenSecret = twitterCredentials.Password;
-                UserScreenName = ApplicationData.Current.LocalSettings.Values["TwitterScreenName"].ToString();
+                UserScreenName = twitterCredentials.Resource;
                 LoggedIn = true;
                 return true;
             }
@@ -209,8 +167,8 @@ namespace pepeizq.Twitter
             var twitterCredentials = PasswordCredential;
             if (twitterCredentials != null)
             {
-                _vault.Remove(twitterCredentials);
-                ApplicationData.Current.LocalSettings.Values["TwitterScreenName"] = null;
+                boveda.Remove(twitterCredentials);
+                //ApplicationData.Current.LocalSettings.Values["TwitterScreenName"] = null;
                 UserScreenName = null;
             }
 
@@ -219,7 +177,58 @@ namespace pepeizq.Twitter
 
         //--------------------------------------------
 
-        public async Task<IEnumerable<TSchema>> CogerTweetsTimelineInicio<TSchema>(string ultimoTweet, IParser<TSchema> parser)
+        public async Task<TwitterUsuario> GenerarUsuario(string screenNombre = null)
+        {
+            string rawResultado = null;
+            try
+            {
+                var usuarioScreenNombre = screenNombre ?? UserScreenName;
+                var uri = new Uri($"{BaseUrl}/users/show.json?screen_name={usuarioScreenNombre}");
+
+                TwitterOAuthRequest request = new TwitterOAuthRequest();
+                rawResultado = await request.EjecutarGetAsync(uri, _tokens);
+
+                TwitterUsuario usuario = JsonConvert.DeserializeObject<TwitterUsuario>(rawResultado);
+                usuario.Tokens = _tokens;
+                return usuario;
+            }
+            catch (WebException wex)
+            {
+                HttpWebResponse response = wex.Response as HttpWebResponse;
+                if (response != null)
+                {
+                    if (response.StatusCode == HttpStatusCode.NotFound)
+                    {
+                        throw new UserNotFoundException(screenNombre);
+                    }
+
+                    if ((int)response.StatusCode == 429)
+                    {
+                        throw new TooManyRequestsException();
+                    }
+
+                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        throw new OAuthKeysRevokedException();
+                    }
+                }
+
+                throw;
+            }
+            catch
+            {
+                if (!string.IsNullOrEmpty(rawResultado))
+                {
+                    var errores = JsonConvert.DeserializeObject<TwitterErrores>(rawResultado);
+
+                    throw new TwitterExcepcion { Errores = errores };
+                }
+
+                throw;
+            }
+        }
+
+        public async Task<IEnumerable<TSchema>> CogerTweetsTimelineInicio<TSchema>(TwitterOAuthTokens tokens, string ultimoTweet, IParser<TSchema> parser)
         where TSchema : SchemaBase
         {
             try
@@ -232,9 +241,9 @@ namespace pepeizq.Twitter
                 var uri = new Uri($"{BaseUrl}/statuses/home_timeline.json?tweet_mode=extended{ultimoTweet}");
 
                 TwitterOAuthRequest request = new TwitterOAuthRequest();
-                var rawResult = await request.EjecutarGetAsync(uri, _tokens);
+                var rawResultado = await request.EjecutarGetAsync(uri, tokens);
 
-                return parser.Parse(rawResult);
+                return parser.Parse(rawResultado);
             }
             catch (WebException wex)
             {
@@ -256,7 +265,7 @@ namespace pepeizq.Twitter
             }
         }
 
-        public async Task<IEnumerable<TSchema>> CogerTweetsTimelineMenciones<TSchema>(string ultimoTweet, IParser<TSchema> parser)
+        public async Task<IEnumerable<TSchema>> CogerTweetsTimelineMenciones<TSchema>(TwitterOAuthTokens tokens, string ultimoTweet, IParser<TSchema> parser)
         where TSchema : SchemaBase
         {
             try
@@ -269,9 +278,9 @@ namespace pepeizq.Twitter
                 var uri = new Uri($"{BaseUrl}/statuses/mentions_timeline.json?tweet_mode=extended{ultimoTweet}");
 
                 TwitterOAuthRequest request = new TwitterOAuthRequest();
-                var rawResult = await request.EjecutarGetAsync(uri, _tokens);
+                var rawResultado = await request.EjecutarGetAsync(uri, tokens);
 
-                return parser.Parse(rawResult);
+                return parser.Parse(rawResultado);
             }
             catch (WebException wex)
             {
@@ -367,14 +376,14 @@ namespace pepeizq.Twitter
             }
         }
 
-        public async Task<bool> Favoritear(TwitterStatus status)
+        public async Task<bool> Favoritear(TwitterOAuthTokens tokens, TwitterStatus status)
         {
             try
             {
                 var uri = new Uri($"{BaseUrl}/favorites/create.json?id={status.TweetID}");
 
                 TwitterOAuthRequest request = new TwitterOAuthRequest();
-                await request.EjecutarPostAsync(uri, _tokens);
+                await request.EjecutarPostAsync(uri, tokens);
 
                 return true;
             }
@@ -398,14 +407,14 @@ namespace pepeizq.Twitter
             }
         }
 
-        public async Task<bool> DeshacerFavorito(TwitterStatus status)
+        public async Task<bool> DeshacerFavorito(TwitterOAuthTokens tokens, TwitterStatus status)
         {
             try
             {
                 var uri = new Uri($"{BaseUrl}/favorites/destroy.json?id={status.TweetID}");
 
                 TwitterOAuthRequest request = new TwitterOAuthRequest();
-                await request.EjecutarPostAsync(uri, _tokens);
+                await request.EjecutarPostAsync(uri, tokens);
 
                 return true;
             }
@@ -429,14 +438,14 @@ namespace pepeizq.Twitter
             }
         }
 
-        public async Task<bool> Retwitear(TwitterStatus status)
+        public async Task<bool> Retwitear(TwitterOAuthTokens tokens, TwitterStatus status)
         {
             try
             {
                 var uri = new Uri($"{BaseUrl}/statuses/retweet/{status.TweetID}.json");
 
                 TwitterOAuthRequest request = new TwitterOAuthRequest();
-                await request.EjecutarPostAsync(uri, _tokens);
+                await request.EjecutarPostAsync(uri, tokens);
 
                 return true;
             }
@@ -460,14 +469,14 @@ namespace pepeizq.Twitter
             }
         }
 
-        public async Task<bool> DeshacerRetweet(TwitterStatus status)
+        public async Task<bool> DeshacerRetweet(TwitterOAuthTokens tokens, TwitterStatus status)
         {
             try
             {
                 var uri = new Uri($"{BaseUrl}/statuses/unretweet/{status.TweetID}.json");
 
                 TwitterOAuthRequest request = new TwitterOAuthRequest();
-                await request.EjecutarPostAsync(uri, _tokens);
+                await request.EjecutarPostAsync(uri, tokens);
 
                 return true;
             }
@@ -491,12 +500,12 @@ namespace pepeizq.Twitter
             }
         }
 
-        public async Task<bool> EnviarTweet(string tweet, params IRandomAccessStream[] imagenes)
+        public async Task<bool> EnviarTweet(TwitterOAuthTokens tokens, string tweet, params IRandomAccessStream[] imagenes)
         {
-            return await EnviarTweet(new TwitterStatus { Mensaje = tweet }, imagenes);
+            return await EnviarTweet(tokens,new TwitterStatus { Mensaje = tweet }, imagenes);
         }
 
-        public async Task<bool> EnviarTweet(TwitterStatus status, params IRandomAccessStream[] imagenes)
+        public async Task<bool> EnviarTweet(TwitterOAuthTokens tokens, TwitterStatus status, params IRandomAccessStream[] imagenes)
         {
             try
             {
@@ -507,7 +516,7 @@ namespace pepeizq.Twitter
                     var ids = new List<string>();
                     foreach (var picture in imagenes)
                     {
-                        ids.Add(await UploadPictureAsync(picture));
+                        ids.Add(await UploadPictureAsync(tokens,picture));
                     }
 
                     mediaIds = "&media_ids=" + string.Join(",", ids);
@@ -516,7 +525,7 @@ namespace pepeizq.Twitter
                 var uri = new Uri($"{BaseUrl}/statuses/update.json?{status.SolicitarParametrosRespuesta}{mediaIds}");
 
                 TwitterOAuthRequest request = new TwitterOAuthRequest();
-                await request.EjecutarPostAsync(uri, _tokens);
+                await request.EjecutarPostAsync(uri, tokens);
 
                 return true;
             }
@@ -540,7 +549,7 @@ namespace pepeizq.Twitter
             }
         }
 
-        public Task ArrancarStreamUsuario(TwitterUsuarioStreamParser parser, TwitterStreamLlamadas.TwitterStreamLlamada llamada)
+        public Task ArrancarStreamUsuario(TwitterOAuthTokens tokens, TwitterUsuarioStreamParser parser, TwitterStreamLlamadas.TwitterStreamLlamada llamada)
         {
             try
             {
@@ -548,7 +557,7 @@ namespace pepeizq.Twitter
 
                 _streamRequest = new TwitterOAuthRequest();
 
-                return _streamRequest.EjecutarGetStreamAsync(uri, _tokens, rawResult => llamada(parser.Parse(rawResult)));
+                return _streamRequest.EjecutarGetStreamAsync(uri, tokens, rawResult => llamada(parser.Parse(rawResult)));
             }
             catch (WebException wex)
             {
@@ -576,7 +585,7 @@ namespace pepeizq.Twitter
             _streamRequest = null;
         }
 
-        public async Task<string> UploadPictureAsync(IRandomAccessStream stream)
+        public async Task<string> UploadPictureAsync(TwitterOAuthTokens tokens, IRandomAccessStream stream)
         {
             var uri = new Uri($"{PublishUrl}/media/upload.json");
 
@@ -589,7 +598,7 @@ namespace pepeizq.Twitter
             string boundary = DateTime.Now.Ticks.ToString("x");
 
             TwitterOAuthRequest request = new TwitterOAuthRequest();
-            return await request.ExecutePostMultipartAsync(uri, _tokens, boundary, fileBytes);
+            return await request.ExecutePostMultipartAsync(uri, tokens, boundary, fileBytes);
         }
 
         //--------------------------------------------
@@ -630,7 +639,7 @@ namespace pepeizq.Twitter
                     items = await GetCustomSearch(config.Query, parser);
                     break;
                 default:
-                    items = await CogerTweetsTimelineInicio(null, parser);
+                    items = await CogerTweetsTimelineInicio(null,null, parser);
                     break;
             }
 
@@ -843,9 +852,9 @@ namespace pepeizq.Twitter
             _tokens.AccessToken = accessToken;
             _tokens.AccessTokenSecret = accessTokenSecret;
 
-            var passwordCredential = new PasswordCredential("TwitterAccessToken", accessToken, accessTokenSecret);
-            ApplicationData.Current.LocalSettings.Values["TwitterScreenName"] = screenName;
-            _vault.Add(passwordCredential);
+            var passwordCredential = new PasswordCredential(screenName, accessToken, accessTokenSecret);
+            //ApplicationData.Current.LocalSettings.Values["TwitterScreenName"] = screenName;
+            boveda.Add(passwordCredential);
 
             return true;
         }

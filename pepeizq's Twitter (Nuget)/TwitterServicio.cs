@@ -99,21 +99,7 @@ namespace pepeizq.Twitter
             return null;
         }
 
-        public async Task<TwitterUsuario> GetUserAsync(string screenName = null)
-        {
-            if (Provider.LoggedIn)
-            {
-                return await Provider.GetUserAsync(screenName);
-            }
-
-            var isLoggedIn = await LoginAsync();
-            if (isLoggedIn)
-            {
-                return await GetUserAsync(screenName);
-            }
-
-            return null;
-        }
+      
 
        
 
@@ -160,33 +146,49 @@ namespace pepeizq.Twitter
 
         //--------------------------------------------
 
-        public async Task<IEnumerable<Tweet.Tweet>> CogerTweetsTimelineInicio(string ultimoTweet)
+        public async Task<TwitterUsuario> GenerarUsuario(string screenName = null)
         {
             if (Provider.LoggedIn)
             {
-                return await Provider.CogerTweetsTimelineInicio(ultimoTweet, new TweetParser());
+                return await Provider.GenerarUsuario(screenName);
             }
 
             var isLoggedIn = await LoginAsync();
             if (isLoggedIn)
             {
-                return await CogerTweetsTimelineInicio(ultimoTweet);
+                return await GenerarUsuario(screenName);
             }
 
             return null;
         }
 
-        public async Task<IEnumerable<Tweet.Tweet>> CogerTweetsTimelineMenciones(string ultimoTweet)
+        public async Task<IEnumerable<Tweet.Tweet>> CogerTweetsTimelineInicio(TwitterOAuthTokens tokens, string ultimoTweet)
         {
             if (Provider.LoggedIn)
             {
-                return await Provider.CogerTweetsTimelineMenciones(ultimoTweet, new TweetParser());
+                return await Provider.CogerTweetsTimelineInicio(tokens,ultimoTweet, new TweetParser());
             }
 
             var isLoggedIn = await LoginAsync();
             if (isLoggedIn)
             {
-                return await CogerTweetsTimelineMenciones(ultimoTweet);
+                return await CogerTweetsTimelineInicio(tokens,ultimoTweet);
+            }
+
+            return null;
+        }
+
+        public async Task<IEnumerable<Tweet.Tweet>> CogerTweetsTimelineMenciones(TwitterOAuthTokens tokens, string ultimoTweet)
+        {
+            if (Provider.LoggedIn)
+            {
+                return await Provider.CogerTweetsTimelineMenciones(tokens,ultimoTweet, new TweetParser());
+            }
+
+            var isLoggedIn = await LoginAsync();
+            if (isLoggedIn)
+            {
+                return await CogerTweetsTimelineMenciones(tokens,ultimoTweet);
             }
 
             return null;
@@ -224,76 +226,76 @@ namespace pepeizq.Twitter
             return null;
         }
 
-        public async Task<bool> Favoritear(TwitterStatus status)
+        public async Task<bool> Favoritear(TwitterOAuthTokens tokens, TwitterStatus status)
         {
             if (Provider.LoggedIn)
             {
-                return await Provider.Favoritear(status);
+                return await Provider.Favoritear(tokens,status);
             }
 
             var isLoggedIn = await LoginAsync();
             if (isLoggedIn)
             {
-                return await Favoritear(status);
+                return await Favoritear(tokens,status);
             }
 
             return false;
         }
 
-        public async Task<bool> DeshacerFavorito(TwitterStatus status)
+        public async Task<bool> DeshacerFavorito(TwitterOAuthTokens tokens, TwitterStatus status)
         {
             if (Provider.LoggedIn)
             {
-                return await Provider.DeshacerFavorito(status);
+                return await Provider.DeshacerFavorito(tokens,status);
             }
 
             var isLoggedIn = await LoginAsync();
             if (isLoggedIn)
             {
-                return await DeshacerFavorito(status);
+                return await DeshacerFavorito(tokens,status);
             }
 
             return false;
         }
 
-        public async Task<bool> Retwitear(TwitterStatus status)
+        public async Task<bool> Retwitear(TwitterOAuthTokens tokens, TwitterStatus status)
         {
             if (Provider.LoggedIn)
             {
-                return await Provider.Retwitear(status);
+                return await Provider.Retwitear(tokens, status);
             }
 
             var isLoggedIn = await LoginAsync();
             if (isLoggedIn)
             {
-                return await Retwitear(status);
+                return await Retwitear(tokens,status);
             }
 
             return false;
         }
 
-        public async Task<bool> DeshacerRetweet(TwitterStatus status)
+        public async Task<bool> DeshacerRetweet(TwitterOAuthTokens tokens, TwitterStatus status)
         {
             if (Provider.LoggedIn)
             {
-                return await Provider.DeshacerRetweet(status);
+                return await Provider.DeshacerRetweet(tokens,status);
             }
 
             var isLoggedIn = await LoginAsync();
             if (isLoggedIn)
             {
-                return await DeshacerRetweet(status);
+                return await DeshacerRetweet(tokens,status);
             }
 
             return false;
         }
 
-        public async Task<bool> EnviarTweet(string mensaje, params IRandomAccessStream[] pictures)
+        public async Task<bool> EnviarTweet(TwitterOAuthTokens tokens, string mensaje, params IRandomAccessStream[] pictures)
         {
-            return await EnviarTweet(new TwitterStatus { Mensaje = mensaje }, pictures);
+            return await EnviarTweet(tokens, new TwitterStatus { Mensaje = mensaje }, pictures);
         }
 
-        public async Task<bool> EnviarTweet(TwitterStatus status, params IRandomAccessStream[] pictures)
+        public async Task<bool> EnviarTweet(TwitterOAuthTokens tokens, TwitterStatus status, params IRandomAccessStream[] pictures)
         {
             if (pictures.Length > 4)
             {
@@ -302,30 +304,30 @@ namespace pepeizq.Twitter
 
             if (Provider.LoggedIn)
             {
-                return await Provider.EnviarTweet(status, pictures);
+                return await Provider.EnviarTweet(tokens,status, pictures);
             }
 
             var isLoggedIn = await LoginAsync();
             if (isLoggedIn)
             {
-                return await EnviarTweet(status, pictures);
+                return await EnviarTweet(tokens,status, pictures);
             }
 
             return false;
         }
 
-        public async Task ArrancarStreamUsuario(TwitterStreamLlamadas.TwitterStreamLlamada llamada)
+        public async Task ArrancarStreamUsuario(TwitterOAuthTokens tokens, TwitterStreamLlamadas.TwitterStreamLlamada llamada)
         {
             if (Provider.LoggedIn)
             {
-                await Provider.ArrancarStreamUsuario(new TwitterUsuarioStreamParser(), llamada);
+                await Provider.ArrancarStreamUsuario(tokens,new TwitterUsuarioStreamParser(), llamada);
                 return;
             }
 
             var isLoggedIn = await LoginAsync();
             if (isLoggedIn)
             {
-                await ArrancarStreamUsuario(llamada);
+                await ArrancarStreamUsuario(tokens,llamada);
             }
         }
 
