@@ -66,5 +66,8 @@ namespace pepeizq.Twitter
         public string Enlace { get; set; }
 
         public TwitterOAuthTokens Tokens { get; set; }
+
+        [JsonProperty("entities")]
+        public Tweet.TweetEntidad Entidades { get; set; }
     }
 }

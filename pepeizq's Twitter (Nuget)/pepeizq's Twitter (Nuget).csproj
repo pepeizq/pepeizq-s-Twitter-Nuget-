@@ -126,8 +126,10 @@
     <Compile Include="Stream\TwitterUsuarioStreamParser.cs" />
     <Compile Include="Tweet\Tweet.cs" />
     <Compile Include="Tweet\TweetEnlace.cs" />
+    <Compile Include="Tweet\TweetEnlaceUsuario.cs" />
     <Compile Include="Tweet\TweetEntidad.cs" />
     <Compile Include="Tweet\TweetEntidadExtendida.cs" />
+    <Compile Include="Tweet\TweetEntidadUsuario.cs" />
     <Compile Include="Tweet\TweetHashtag.cs" />
     <Compile Include="Tweet\TweetMedia.cs" />
     <Compile Include="Tweet\TweetMencion.cs" />

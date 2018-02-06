@@ -38,9 +38,9 @@ namespace pepeizq.Twitter
 
         private TwitterOAuthRequest _streamRequest;
 
-        public string UserScreenName { get; set; }
+        public string UsuarioScreenNombre { get; set; }
 
-        public bool LoggedIn { get; private set; }
+        public bool Logeado { get; private set; }
 
         public TwitterDataProvider(TwitterOAuthTokens tokens)
         {
@@ -55,9 +55,6 @@ namespace pepeizq.Twitter
             }
         }
 
-        
-
-       
         public async Task<IEnumerable<TSchema>> SearchAsync<TSchema>(string hashTag, int maxRecords, IParser<TSchema> parser)
             where TSchema : SchemaBase
         {
@@ -92,17 +89,12 @@ namespace pepeizq.Twitter
             }
         }
 
-        private PasswordCredential PasswordCredential
+        private PasswordCredential PasswordCredencial
         {
             get
             {
-                //if (ApplicationData.Current.LocalSettings.Values["TwitterScreenName"] == null)
-                //{
-                //    return null;
-                //}
-
                 var passwordCredentials = boveda.RetrieveAll();
-                string usuario = UserScreenName;
+                string usuario = UsuarioScreenNombre;
 
                 var temp = passwordCredentials.FirstOrDefault(c => c.Resource == usuario);
 
@@ -115,23 +107,23 @@ namespace pepeizq.Twitter
             }
         }
 
-        public async Task<bool> LoginAsync()
+        public async Task<bool> Logear()
         {
-            UserScreenName = (string)ApplicationData.Current.LocalSettings.Values["TwitterScreenNombre"];
+            UsuarioScreenNombre = (string)ApplicationData.Current.LocalSettings.Values["TwitterScreenNombre"];
 
-            var twitterCredentials = PasswordCredential;
-            if (twitterCredentials != null)
+            var twitterCredenciales = PasswordCredencial;
+            if (twitterCredenciales != null)
             {
-                _tokens.AccessToken = twitterCredentials.UserName;
-                _tokens.AccessTokenSecret = twitterCredentials.Password;
-                UserScreenName = twitterCredentials.Resource;
-                LoggedIn = true;
+                _tokens.AccessToken = twitterCredenciales.UserName;
+                _tokens.AccessTokenSecret = twitterCredenciales.Password;
+                UsuarioScreenNombre = twitterCredenciales.Resource;
+                Logeado = true;
                 return true;
             }
 
             if (await InitializeRequestAccessTokensAsync(_tokens.CallbackUri) == false)
             {
-                LoggedIn = false;
+                Logeado = false;
                 return false;
             }
 
@@ -146,33 +138,32 @@ namespace pepeizq.Twitter
             switch (result.ResponseStatus)
             {
                 case WebAuthenticationStatus.Success:
-                    LoggedIn = true;
+                    Logeado = true;
                     return await ExchangeRequestTokenForAccessTokenAsync(result.ResponseData);
                 case WebAuthenticationStatus.ErrorHttp:
                     Debug.WriteLine("WAB failed, message={0}", result.ResponseErrorDetail.ToString());
-                    LoggedIn = false;
+                    Logeado = false;
                     return false;
                 case WebAuthenticationStatus.UserCancel:
                     Debug.WriteLine("WAB user aborted.");
-                    LoggedIn = false;
+                    Logeado = false;
                     return false;
             }
 
-            LoggedIn = false;
+            Logeado = false;
             return false;
         }
 
-        public void Logout()
+        public void Deslogear()
         {
-            var twitterCredentials = PasswordCredential;
-            if (twitterCredentials != null)
+            var twitterCredenciales = PasswordCredencial;
+            if (twitterCredenciales != null)
             {
-                boveda.Remove(twitterCredentials);
-                //ApplicationData.Current.LocalSettings.Values["TwitterScreenName"] = null;
-                UserScreenName = null;
+                boveda.Remove(twitterCredenciales);
+                UsuarioScreenNombre = null;
             }
 
-            LoggedIn = false;
+            Logeado = false;
         }
 
         //--------------------------------------------
@@ -182,7 +173,7 @@ namespace pepeizq.Twitter
             string rawResultado = null;
             try
             {
-                var usuarioScreenNombre = screenNombre ?? UserScreenName;
+                var usuarioScreenNombre = screenNombre ?? UsuarioScreenNombre;
                 var uri = new Uri($"{BaseUrl}/users/show.json?screen_name={usuarioScreenNombre}");
 
                 TwitterOAuthRequest request = new TwitterOAuthRequest();
@@ -549,6 +540,84 @@ namespace pepeizq.Twitter
             }
         }
 
+        public async Task<string> UploadPictureAsync(TwitterOAuthTokens tokens, IRandomAccessStream stream)
+        {
+            var uri = new Uri($"{PublishUrl}/media/upload.json");
+
+            var fileBytes = new byte[stream.Size];
+
+            await stream.ReadAsync(fileBytes.AsBuffer(), (uint)stream.Size, InputStreamOptions.None);
+
+            stream.Seek(0);
+
+            string boundary = DateTime.Now.Ticks.ToString("x");
+
+            TwitterOAuthRequest request = new TwitterOAuthRequest();
+            return await request.ExecutePostMultipartAsync(uri, tokens, boundary, fileBytes);
+        }
+
+        public async Task<bool> SeguirUsuario(TwitterOAuthTokens tokens, string usuarioID)
+        {
+            try
+            {
+                var uri = new Uri($"{BaseUrl}/friendships/create.json?user_id={usuarioID}&follow=true");
+
+                TwitterOAuthRequest request = new TwitterOAuthRequest();
+                await request.EjecutarPostAsync(uri, tokens);
+
+                return true;
+            }
+            catch (WebException wex)
+            {
+                HttpWebResponse response = wex.Response as HttpWebResponse;
+                if (response != null)
+                {
+                    if ((int)response.StatusCode == 429)
+                    {
+                        throw new TooManyRequestsException();
+                    }
+
+                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        throw new OAuthKeysRevokedException();
+                    }
+                }
+
+                throw;
+            }
+        }
+
+        public async Task<bool> DeshacerSeguirUsuario(TwitterOAuthTokens tokens, string usuarioID)
+        {
+            try
+            {
+                var uri = new Uri($"{BaseUrl}/friendships/destroy.json?user_id={usuarioID}");
+
+                TwitterOAuthRequest request = new TwitterOAuthRequest();
+                await request.EjecutarPostAsync(uri, tokens);
+
+                return true;
+            }
+            catch (WebException wex)
+            {
+                HttpWebResponse response = wex.Response as HttpWebResponse;
+                if (response != null)
+                {
+                    if ((int)response.StatusCode == 429)
+                    {
+                        throw new TooManyRequestsException();
+                    }
+
+                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        throw new OAuthKeysRevokedException();
+                    }
+                }
+
+                throw;
+            }
+        }
+
         public Task ArrancarStreamUsuario(TwitterOAuthTokens tokens, TwitterUsuarioStreamParser parser, TwitterStreamLlamadas.TwitterStreamLlamada llamada)
         {
             try
@@ -585,21 +654,7 @@ namespace pepeizq.Twitter
             _streamRequest = null;
         }
 
-        public async Task<string> UploadPictureAsync(TwitterOAuthTokens tokens, IRandomAccessStream stream)
-        {
-            var uri = new Uri($"{PublishUrl}/media/upload.json");
-
-            var fileBytes = new byte[stream.Size];
-
-            await stream.ReadAsync(fileBytes.AsBuffer(), (uint)stream.Size, InputStreamOptions.None);
-
-            stream.Seek(0);
-
-            string boundary = DateTime.Now.Ticks.ToString("x");
-
-            TwitterOAuthRequest request = new TwitterOAuthRequest();
-            return await request.ExecutePostMultipartAsync(uri, tokens, boundary, fileBytes);
-        }
+      
 
         //--------------------------------------------
 
@@ -848,7 +903,7 @@ namespace pepeizq.Twitter
             var accessToken = ExtractTokenFromResponse(data, TwitterOAuthTokenTipo.OAuthRequestOrAccessToken);
             var accessTokenSecret = ExtractTokenFromResponse(data, TwitterOAuthTokenTipo.OAuthRequestOrAccessTokenSecret);
 
-            UserScreenName = screenName;
+            UsuarioScreenNombre = screenName;
             _tokens.AccessToken = accessToken;
             _tokens.AccessTokenSecret = accessTokenSecret;
 
