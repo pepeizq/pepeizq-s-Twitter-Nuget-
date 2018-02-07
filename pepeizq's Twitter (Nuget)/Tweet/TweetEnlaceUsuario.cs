@@ -5,6 +5,6 @@ namespace pepeizq.Twitter.Tweet
     public class TweetEnlaceUsuario
     {
         [JsonProperty("urls")]
-        public TweetEnlace Enlaces { get; set; }
+        public TweetEnlace[] Enlaces { get; set; }
     }
 }
