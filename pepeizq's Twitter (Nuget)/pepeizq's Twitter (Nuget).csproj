@@ -133,7 +133,8 @@
     <Compile Include="Tweet\TweetHashtag.cs" />
     <Compile Include="Tweet\TweetMedia.cs" />
     <Compile Include="Tweet\TweetMencion.cs" />
-    <Compile Include="Tweet\TweetParser.cs" />
+    <Compile Include="Tweet\TweetParserIndividual.cs" />
+    <Compile Include="Tweet\TweetParserLista.cs" />
     <Compile Include="Tweet\TweetVideo.cs" />
     <Compile Include="Tweet\TweetVideoVariante.cs" />
     <Compile Include="TwitterDataConfig.cs" />

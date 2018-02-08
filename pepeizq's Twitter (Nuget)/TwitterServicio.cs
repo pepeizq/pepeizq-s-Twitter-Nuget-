@@ -206,6 +206,22 @@ namespace pepeizq.Twitter
             return null;
         }
 
+        public async Task<Tweet.Tweet> CogerTweet(TwitterOAuthTokens tokens, string idTweet)
+        {
+            if (Provider.Logeado)
+            {
+                return await Provider.CogerTweet(tokens, idTweet, new TweetParserIndividual());
+            }
+
+            var isLoggedIn = await Logear();
+            if (isLoggedIn)
+            {
+                return await CogerTweet(tokens, idTweet);
+            }
+
+            return null;
+        }
+
         public async Task<Banner.Banner> CogerBannerUsuario(string screenNombre)
         {
             if (Provider.Logeado)

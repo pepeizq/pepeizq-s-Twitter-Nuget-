@@ -333,6 +333,40 @@ namespace pepeizq.Twitter
             }
         }
 
+        public async Task<Tweet.Tweet> CogerTweet(TwitterOAuthTokens tokens, string idTweet, TweetParserIndividual parser)
+        {
+            try
+            {
+                var uri = new Uri($"{BaseUrl}/statuses/show.json?id={idTweet}&tweet_mode=extended");
+
+                TwitterOAuthRequest request = new TwitterOAuthRequest();
+
+                string rawResultado = null;
+                rawResultado = await request.EjecutarGetAsync(uri, tokens);
+
+                var resultado = parser.Parse(rawResultado);
+                return resultado;
+            }
+            catch (WebException wex)
+            {
+                HttpWebResponse response = wex.Response as HttpWebResponse;
+                if (response != null)
+                {
+                    if ((int)response.StatusCode == 429)
+                    {
+                        throw new TooManyRequestsException();
+                    }
+
+                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        throw new OAuthKeysRevokedException();
+                    }
+                }
+
+                throw;
+            }
+        }
+
         public async Task<Banner.Banner> CogerBannerUsuario(string screenNombre, BannerParser parser)
         {
             try
@@ -653,9 +687,7 @@ namespace pepeizq.Twitter
             _streamRequest?.Abortar();
             _streamRequest = null;
         }
-
-      
-
+    
         //--------------------------------------------
 
         protected override IParser<SchemaBase> GetDefaultParser(TwitterDataConfig config)
