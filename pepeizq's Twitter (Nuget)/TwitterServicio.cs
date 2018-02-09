@@ -302,6 +302,38 @@ namespace pepeizq.Twitter
             return false;
         }
 
+        public async Task<bool> BloquearUsuario(TwitterOAuthTokens tokens, string screenNombre)
+        {
+            if (Provider.Logeado)
+            {
+                return await Provider.BloquearUsuario(tokens, screenNombre);
+            }
+
+            var isLoggedIn = await Logear();
+            if (isLoggedIn)
+            {
+                return await BloquearUsuario(tokens, screenNombre);
+            }
+
+            return false;
+        }
+
+        public async Task<bool> DeshacerBloquearUsuario(TwitterOAuthTokens tokens, string screenNombre)
+        {
+            if (Provider.Logeado)
+            {
+                return await Provider.DeshacerBloquearUsuario(tokens, screenNombre);
+            }
+
+            var isLoggedIn = await Logear();
+            if (isLoggedIn)
+            {
+                return await DeshacerBloquearUsuario(tokens, screenNombre);
+            }
+
+            return false;
+        }
+
         public async Task<bool> EnviarTweet(TwitterOAuthTokens tokens, string mensaje, params IRandomAccessStream[] pictures)
         {
             return await EnviarTweet(tokens, new TwitterStatus { Mensaje = mensaje }, pictures);
