@@ -87,7 +87,7 @@ namespace pepeizq.Twitter
         {
             if (Provider.Logeado)
             {
-                return await Provider.SearchAsync(hashTag, maxRecords, new TwitterSearchParser());
+                return await Provider.SearchAsync(hashTag, maxRecords, new TwitterBusquedaParser());
             }
 
             var isLoggedIn = await Logear();
@@ -217,6 +217,22 @@ namespace pepeizq.Twitter
             if (isLoggedIn)
             {
                 return await CogerTweet(tokens, idTweet);
+            }
+
+            return null;
+        }
+
+        public async Task<IEnumerable<Tweet.Tweet>> CogerRespuestasTweet(TwitterOAuthTokens tokens, string screenNombre, string tweetID)
+        {
+            if (Provider.Logeado)
+            {
+                return await Provider.CogerRespuestasTweet(tokens, screenNombre, tweetID, new TwitterBusquedaParser());
+            }
+
+            var isLoggedIn = await Logear();
+            if (isLoggedIn)
+            {
+                return await CogerRespuestasTweet(tokens, screenNombre, tweetID);
             }
 
             return null;

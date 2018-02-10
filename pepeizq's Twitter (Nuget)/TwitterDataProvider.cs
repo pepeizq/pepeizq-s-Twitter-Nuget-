@@ -367,6 +367,41 @@ namespace pepeizq.Twitter
             }
         }
 
+        public async Task<IEnumerable<TSchema>> CogerRespuestasTweet<TSchema>(TwitterOAuthTokens tokens, string screenNombre, string tweetID, IParser<TSchema> parser)
+        where TSchema : SchemaBase
+        {
+            try
+            {
+                var uri = new Uri($"{BaseUrl}/search/tweets.json?q=%40{screenNombre}&since_id={tweetID}&result_type=recent&count=100&tweet_mode=extended");
+
+                TwitterOAuthRequest request = new TwitterOAuthRequest();
+
+                string rawResultado = null;
+                rawResultado = await request.EjecutarGetAsync(uri, tokens);
+
+                var resultado = parser.Parse(rawResultado);
+                return resultado.Take(100).ToList();
+            }
+            catch (WebException wex)
+            {
+                HttpWebResponse response = wex.Response as HttpWebResponse;
+                if (response != null)
+                {
+                    if ((int)response.StatusCode == 429)
+                    {
+                        throw new TooManyRequestsException();
+                    }
+
+                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        throw new OAuthKeysRevokedException();
+                    }
+                }
+
+                throw;
+            }
+        }
+
         public async Task<Banner.Banner> CogerBannerUsuario(string screenNombre, BannerParser parser)
         {
             try
@@ -762,7 +797,7 @@ namespace pepeizq.Twitter
             switch (config.QueryTipo)
             {
                 case TwitterQueryTipo.Busqueda:
-                    return new TwitterSearchParser();
+                    return new TwitterBusquedaParser();
                 case TwitterQueryTipo.Inicio:
                 case TwitterQueryTipo.Usuario:
                 case TwitterQueryTipo.Banner:

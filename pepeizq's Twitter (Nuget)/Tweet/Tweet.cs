@@ -32,6 +32,9 @@ namespace pepeizq.Twitter.Tweet
         [JsonProperty("in_reply_to_screen_name")]
         public string RespuestaUsuarioScreenNombre { get; set; }
 
+        [JsonProperty("in_reply_to_status_id")]
+        public string RespuestaUsuarioID { get; set; }
+
         [JsonProperty("display_text_range")]
         public int[] TextoRango { get; set; }
 

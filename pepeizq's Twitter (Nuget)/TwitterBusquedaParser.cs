@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace pepeizq.Twitter
 {
-    public class TwitterSearchParser : IParser<Tweet.Tweet>
+    public class TwitterBusquedaParser : IParser<Tweet.Tweet>
     {
         public IEnumerable<Tweet.Tweet> Parse(string data)
         {
@@ -14,7 +14,7 @@ namespace pepeizq.Twitter
                 return null;
             }
 
-            var resultado = JsonConvert.DeserializeObject<TwitterSearchResultado>(data);
+            var resultado = JsonConvert.DeserializeObject<TwitterBusquedaResultado>(data);
 
             return resultado.Statuses.ToList();
         }
