@@ -622,6 +622,99 @@ namespace pepeizq.Twitter
             }
         }
 
+        public async Task<bool> ReportarUsuario(TwitterOAuthTokens tokens, string screenNombre)
+        {
+            try
+            {
+                var uri = new Uri($"{BaseUrl}/users/report_spam.json?screen_name={screenNombre}");
+
+                TwitterOAuthRequest request = new TwitterOAuthRequest();
+                await request.EjecutarPostAsync(uri, tokens);
+
+                return true;
+            }
+            catch (WebException wex)
+            {
+                HttpWebResponse response = wex.Response as HttpWebResponse;
+                if (response != null)
+                {
+                    if ((int)response.StatusCode == 429)
+                    {
+                        throw new TooManyRequestsException();
+                    }
+
+                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        throw new OAuthKeysRevokedException();
+                    }
+                }
+
+                throw;
+            }
+        }
+
+        public async Task<bool> MutearUsuario(TwitterOAuthTokens tokens, string screenNombre)
+        {
+            try
+            {
+                var uri = new Uri($"{BaseUrl}/mutes/users/create.json?screen_name={screenNombre}");
+
+                TwitterOAuthRequest request = new TwitterOAuthRequest();
+                await request.EjecutarPostAsync(uri, tokens);
+
+                return true;
+            }
+            catch (WebException wex)
+            {
+                HttpWebResponse response = wex.Response as HttpWebResponse;
+                if (response != null)
+                {
+                    if ((int)response.StatusCode == 429)
+                    {
+                        throw new TooManyRequestsException();
+                    }
+
+                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        throw new OAuthKeysRevokedException();
+                    }
+                }
+
+                throw;
+            }
+        }
+
+        public async Task<bool> DeshacerMutearUsuario(TwitterOAuthTokens tokens, string screenNombre)
+        {
+            try
+            {
+                var uri = new Uri($"{BaseUrl}/mutes/users/destroy.json?screen_name={screenNombre}");
+
+                TwitterOAuthRequest request = new TwitterOAuthRequest();
+                await request.EjecutarPostAsync(uri, tokens);
+
+                return true;
+            }
+            catch (WebException wex)
+            {
+                HttpWebResponse response = wex.Response as HttpWebResponse;
+                if (response != null)
+                {
+                    if ((int)response.StatusCode == 429)
+                    {
+                        throw new TooManyRequestsException();
+                    }
+
+                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        throw new OAuthKeysRevokedException();
+                    }
+                }
+
+                throw;
+            }
+        }
+
         public async Task<bool> EnviarTweet(TwitterOAuthTokens tokens, string tweet, params IRandomAccessStream[] imagenes)
         {
             return await EnviarTweet(tokens,new TwitterStatus { Mensaje = tweet }, imagenes);
