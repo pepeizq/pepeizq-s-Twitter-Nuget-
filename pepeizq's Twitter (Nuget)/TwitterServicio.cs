@@ -1,6 +1,8 @@
 ﻿using Microsoft.Toolkit.Services;
 using pepeizq.Twitter.Banner;
+using pepeizq.Twitter.Busqueda;
 using pepeizq.Twitter.OAuth;
+using pepeizq.Twitter.OEmbed;
 using pepeizq.Twitter.Stream;
 using pepeizq.Twitter.Tweet;
 using System;
@@ -87,7 +89,7 @@ namespace pepeizq.Twitter
         {
             if (Provider.Logeado)
             {
-                return await Provider.SearchAsync(hashTag, maxRecords, new TwitterBusquedaParser());
+                return await Provider.SearchAsync(hashTag, maxRecords, new TwitterBusquedaTweetsParser());
             }
 
             var isLoggedIn = await Logear();
@@ -222,17 +224,33 @@ namespace pepeizq.Twitter
             return null;
         }
 
-        public async Task<IEnumerable<Tweet.Tweet>> CogerRespuestasTweet(TwitterOAuthTokens tokens, string screenNombre, string tweetID)
+        public async Task<IEnumerable<Tweet.Tweet>> BuscarRespuestasTweet(TwitterOAuthTokens tokens, string screenNombre, string tweetID)
         {
             if (Provider.Logeado)
             {
-                return await Provider.CogerRespuestasTweet(tokens, screenNombre, tweetID, new TwitterBusquedaParser());
+                return await Provider.BuscarRespuestasTweet(tokens, screenNombre, tweetID, new TwitterBusquedaTweetsParser());
             }
 
             var isLoggedIn = await Logear();
             if (isLoggedIn)
             {
-                return await CogerRespuestasTweet(tokens, screenNombre, tweetID);
+                return await BuscarRespuestasTweet(tokens, screenNombre, tweetID);
+            }
+
+            return null;
+        }
+
+        public async Task<IEnumerable<TwitterUsuario>> BuscarUsuarios(TwitterOAuthTokens tokens, string screenNombre)
+        {
+            if (Provider.Logeado)
+            {
+                return await Provider.BuscarUsuarios(tokens, screenNombre, new TwitterBusquedaUsuariosParser());
+            }
+
+            var isLoggedIn = await Logear();
+            if (isLoggedIn)
+            {
+                return await BuscarUsuarios(tokens, screenNombre);
             }
 
             return null;
@@ -249,6 +267,22 @@ namespace pepeizq.Twitter
             if (isLoggedIn)
             {
                 return await CogerBannerUsuario(screenNombre);
+            }
+
+            return null;
+        }
+
+        public async Task<OEmbed.OEmbed> CogerOEmbedTweet(string enlace)
+        {
+            if (Provider.Logeado)
+            {
+                return await Provider.CogerOEmbedTweet(enlace, new OEmbedParser());
+            }
+
+            var isLoggedIn = await Logear();
+            if (isLoggedIn)
+            {
+                return await CogerOEmbedTweet(enlace);
             }
 
             return null;

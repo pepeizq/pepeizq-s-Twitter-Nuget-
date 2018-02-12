@@ -1,9 +1,10 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Toolkit.Services;
+using Newtonsoft.Json;
 using pepeizq.Twitter.OAuth;
 
 namespace pepeizq.Twitter
 {
-    public class TwitterUsuario
+    public class TwitterUsuario : SchemaBase, ITwitterResultado
     {
         [JsonProperty("id_str")]
         public string Id { get; set; }

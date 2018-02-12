@@ -11,7 +11,9 @@ using Microsoft.Toolkit.Services;
 using Microsoft.Toolkit.Services.Exceptions;
 using Newtonsoft.Json;
 using pepeizq.Twitter.Banner;
+using pepeizq.Twitter.Busqueda;
 using pepeizq.Twitter.OAuth;
+using pepeizq.Twitter.OEmbed;
 using pepeizq.Twitter.Stream;
 using pepeizq.Twitter.Tweet;
 using Windows.Security.Authentication.Web;
@@ -367,7 +369,7 @@ namespace pepeizq.Twitter
             }
         }
 
-        public async Task<IEnumerable<TSchema>> CogerRespuestasTweet<TSchema>(TwitterOAuthTokens tokens, string screenNombre, string tweetID, IParser<TSchema> parser)
+        public async Task<IEnumerable<TSchema>> BuscarRespuestasTweet<TSchema>(TwitterOAuthTokens tokens, string screenNombre, string tweetID, IParser<TSchema> parser)
         where TSchema : SchemaBase
         {
             try
@@ -402,11 +404,80 @@ namespace pepeizq.Twitter
             }
         }
 
+        public async Task<IEnumerable<TSchema>> BuscarUsuarios<TSchema>(TwitterOAuthTokens tokens, string screenNombre, IParser<TSchema> parser)
+        where TSchema : SchemaBase
+        {
+            try
+            {
+                var uri = new Uri($"{BaseUrl}/users/search.json?q={screenNombre}&count=20");
+
+                TwitterOAuthRequest request = new TwitterOAuthRequest();
+
+                string rawResultado = null;
+                rawResultado = await request.EjecutarGetAsync(uri, tokens);
+
+                var resultado = parser.Parse(rawResultado);
+                return resultado.Take(20).ToList();
+            }
+            catch (WebException wex)
+            {
+                HttpWebResponse response = wex.Response as HttpWebResponse;
+                if (response != null)
+                {
+                    if ((int)response.StatusCode == 429)
+                    {
+                        throw new TooManyRequestsException();
+                    }
+
+                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        throw new OAuthKeysRevokedException();
+                    }
+                }
+
+                throw;
+            }
+        }
+
         public async Task<Banner.Banner> CogerBannerUsuario(string screenNombre, BannerParser parser)
         {
             try
             {
                 var uri = new Uri($"{BaseUrl}/users/profile_banner.json?screen_name={screenNombre}");
+
+                TwitterOAuthRequest request = new TwitterOAuthRequest();
+
+                string rawResultado = null;
+                rawResultado = await request.EjecutarGetAsync(uri, _tokens);
+
+                var resultado = parser.Parse(rawResultado);
+                return resultado;
+            }
+            catch (WebException wex)
+            {
+                HttpWebResponse response = wex.Response as HttpWebResponse;
+                if (response != null)
+                {
+                    if ((int)response.StatusCode == 429)
+                    {
+                        throw new TooManyRequestsException();
+                    }
+
+                    if (response.StatusCode == HttpStatusCode.Unauthorized)
+                    {
+                        throw new OAuthKeysRevokedException();
+                    }
+                }
+
+                throw;
+            }
+        }
+
+        public async Task<OEmbed.OEmbed> CogerOEmbedTweet(string enlace, OEmbedParser parser)
+        {
+            try
+            {
+                var uri = new Uri($"https://publish.twitter.com/oembed?url={enlace}");
 
                 TwitterOAuthRequest request = new TwitterOAuthRequest();
 
@@ -890,7 +961,7 @@ namespace pepeizq.Twitter
             switch (config.QueryTipo)
             {
                 case TwitterQueryTipo.Busqueda:
-                    return new TwitterBusquedaParser();
+                    return new TwitterBusquedaTweetsParser();
                 case TwitterQueryTipo.Inicio:
                 case TwitterQueryTipo.Usuario:
                 case TwitterQueryTipo.Banner:

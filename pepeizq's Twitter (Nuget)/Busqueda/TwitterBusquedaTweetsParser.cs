@@ -3,9 +3,9 @@ using System.Linq;
 using Microsoft.Toolkit.Services;
 using Newtonsoft.Json;
 
-namespace pepeizq.Twitter
+namespace pepeizq.Twitter.Busqueda
 {
-    public class TwitterBusquedaParser : IParser<Tweet.Tweet>
+    public class TwitterBusquedaTweetsParser : IParser<Tweet.Tweet>
     {
         public IEnumerable<Tweet.Tweet> Parse(string data)
         {
@@ -14,9 +14,9 @@ namespace pepeizq.Twitter
                 return null;
             }
 
-            var resultado = JsonConvert.DeserializeObject<TwitterBusquedaResultado>(data);
+            var resultado = JsonConvert.DeserializeObject<TwitterBusquedaTweetsResultado>(data);
 
-            return resultado.Statuses.ToList();
+            return resultado.Tweets.ToList();
         }
     }
 }
