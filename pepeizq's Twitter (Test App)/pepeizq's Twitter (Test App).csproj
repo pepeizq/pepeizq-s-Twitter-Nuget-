@@ -130,6 +130,9 @@
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.0.6</Version>
     </PackageReference>
+    <PackageReference Include="Microsoft.Toolkit.Services">
+      <Version>2.1.1</Version>
+    </PackageReference>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\pepeizq%27s Twitter %28Nuget%29\pepeizq%27s Twitter %28Nuget%29.csproj">
