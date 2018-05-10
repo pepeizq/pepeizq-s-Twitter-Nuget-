@@ -51,8 +51,11 @@ namespace pepeizq.Twitter
 
             if (_client == null)
             {
-                HttpClientHandler handler = new HttpClientHandler();
-                handler.AutomaticDecompression = DecompressionMethods.GZip;
+                HttpClientHandler handler = new HttpClientHandler
+                {
+                    AutomaticDecompression = DecompressionMethods.GZip
+                };
+
                 _client = new HttpClient(handler);
             }
         }
@@ -73,8 +76,7 @@ namespace pepeizq.Twitter
             }
             catch (WebException wex)
             {
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                if (response != null)
+                if (wex.Response is HttpWebResponse response)
                 {
                     if ((int)response.StatusCode == 429)
                     {
@@ -187,8 +189,7 @@ namespace pepeizq.Twitter
             }
             catch (WebException wex)
             {
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                if (response != null)
+                if (wex.Response is HttpWebResponse response)
                 {
                     if (response.StatusCode == HttpStatusCode.NotFound)
                     {
@@ -240,8 +241,7 @@ namespace pepeizq.Twitter
             }
             catch (WebException wex)
             {
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                if (response != null)
+                if (wex.Response is HttpWebResponse response)
                 {
                     if ((int)response.StatusCode == 429)
                     {
@@ -277,8 +277,7 @@ namespace pepeizq.Twitter
             }
             catch (WebException wex)
             {
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                if (response != null)
+                if (wex.Response is HttpWebResponse response)
                 {
                     if ((int)response.StatusCode == 429)
                     {
@@ -317,8 +316,7 @@ namespace pepeizq.Twitter
             }
             catch (WebException wex)
             {
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                if (response != null)
+                if (wex.Response is HttpWebResponse response)
                 {
                     if ((int)response.StatusCode == 429)
                     {
@@ -351,8 +349,7 @@ namespace pepeizq.Twitter
             }
             catch (WebException wex)
             {
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                if (response != null)
+                if (wex.Response is HttpWebResponse response)
                 {
                     if ((int)response.StatusCode == 429)
                     {
@@ -386,8 +383,7 @@ namespace pepeizq.Twitter
             }
             catch (WebException wex)
             {
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                if (response != null)
+                if (wex.Response is HttpWebResponse response)
                 {
                     if ((int)response.StatusCode == 429)
                     {
@@ -421,8 +417,7 @@ namespace pepeizq.Twitter
             }
             catch (WebException wex)
             {
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                if (response != null)
+                if (wex.Response is HttpWebResponse response)
                 {
                     if ((int)response.StatusCode == 429)
                     {
@@ -455,8 +450,7 @@ namespace pepeizq.Twitter
             }
             catch (WebException wex)
             {
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                if (response != null)
+                if (wex.Response is HttpWebResponse response)
                 {
                     if ((int)response.StatusCode == 429)
                     {
@@ -489,8 +483,7 @@ namespace pepeizq.Twitter
             }
             catch (WebException wex)
             {
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                if (response != null)
+                if (wex.Response is HttpWebResponse response)
                 {
                     if ((int)response.StatusCode == 429)
                     {
@@ -520,8 +513,7 @@ namespace pepeizq.Twitter
             }
             catch (WebException wex)
             {
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                if (response != null)
+                if (wex.Response is HttpWebResponse response)
                 {
                     if ((int)response.StatusCode == 429)
                     {
@@ -551,8 +543,7 @@ namespace pepeizq.Twitter
             }
             catch (WebException wex)
             {
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                if (response != null)
+                if (wex.Response is HttpWebResponse response)
                 {
                     if ((int)response.StatusCode == 429)
                     {
@@ -582,8 +573,7 @@ namespace pepeizq.Twitter
             }
             catch (WebException wex)
             {
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                if (response != null)
+                if (wex.Response is HttpWebResponse response)
                 {
                     if ((int)response.StatusCode == 429)
                     {
@@ -613,8 +603,7 @@ namespace pepeizq.Twitter
             }
             catch (WebException wex)
             {
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                if (response != null)
+                if (wex.Response is HttpWebResponse response)
                 {
                     if ((int)response.StatusCode == 429)
                     {
@@ -644,8 +633,7 @@ namespace pepeizq.Twitter
             }
             catch (WebException wex)
             {
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                if (response != null)
+                if (wex.Response is HttpWebResponse response)
                 {
                     if ((int)response.StatusCode == 429)
                     {
@@ -675,8 +663,7 @@ namespace pepeizq.Twitter
             }
             catch (WebException wex)
             {
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                if (response != null)
+                if (wex.Response is HttpWebResponse response)
                 {
                     if ((int)response.StatusCode == 429)
                     {
@@ -706,8 +693,7 @@ namespace pepeizq.Twitter
             }
             catch (WebException wex)
             {
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                if (response != null)
+                if (wex.Response is HttpWebResponse response)
                 {
                     if ((int)response.StatusCode == 429)
                     {
@@ -737,8 +723,7 @@ namespace pepeizq.Twitter
             }
             catch (WebException wex)
             {
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                if (response != null)
+                if (wex.Response is HttpWebResponse response)
                 {
                     if ((int)response.StatusCode == 429)
                     {
@@ -768,8 +753,7 @@ namespace pepeizq.Twitter
             }
             catch (WebException wex)
             {
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                if (response != null)
+                if (wex.Response is HttpWebResponse response)
                 {
                     if ((int)response.StatusCode == 429)
                     {
@@ -817,8 +801,7 @@ namespace pepeizq.Twitter
             }
             catch (WebException wex)
             {
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                if (response != null)
+                if (wex.Response is HttpWebResponse response)
                 {
                     if ((int)response.StatusCode == 429)
                     {
@@ -864,8 +847,7 @@ namespace pepeizq.Twitter
             }
             catch (WebException wex)
             {
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                if (response != null)
+                if (wex.Response is HttpWebResponse response)
                 {
                     if ((int)response.StatusCode == 429)
                     {
@@ -895,8 +877,7 @@ namespace pepeizq.Twitter
             }
             catch (WebException wex)
             {
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                if (response != null)
+                if (wex.Response is HttpWebResponse response)
                 {
                     if ((int)response.StatusCode == 429)
                     {
@@ -925,8 +906,7 @@ namespace pepeizq.Twitter
             }
             catch (WebException wex)
             {
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                if (response != null)
+                if (wex.Response is HttpWebResponse response)
                 {
                     if ((int)response.StatusCode == 429)
                     {
@@ -1082,8 +1062,7 @@ namespace pepeizq.Twitter
             }
             catch (WebException wex)
             {
-                HttpWebResponse response = wex.Response as HttpWebResponse;
-                if (response != null)
+                if (wex.Response is HttpWebResponse response)
                 {
                     if ((int)response.StatusCode == 429)
                     {
@@ -1201,7 +1180,7 @@ namespace pepeizq.Twitter
             _tokens.AccessTokenSecret = accessTokenSecret;
 
             var passwordCredential = new PasswordCredential(screenName, accessToken, accessTokenSecret);
-            //ApplicationData.Current.LocalSettings.Values["TwitterScreenName"] = screenName;
+            //ApplicationData.Current.LocalSettings.Values["TwitterScreenNombre"] = screenName;
             boveda.Add(passwordCredential);
 
             return true;

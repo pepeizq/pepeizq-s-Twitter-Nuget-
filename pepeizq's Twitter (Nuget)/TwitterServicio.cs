@@ -30,7 +30,7 @@ namespace pepeizq.Twitter
 
         public string UsuarioScreenNombre => Provider.UsuarioScreenNombre;
 
-        public bool Initialize(string consumerKey, string consumerSecret, string callbackUri)
+        public bool Iniciar(string consumerKey, string consumerSecret, string callbackUri)
         {
             if (string.IsNullOrEmpty(consumerKey))
             {
@@ -59,12 +59,7 @@ namespace pepeizq.Twitter
 
         public bool Initialize(TwitterOAuthTokens oAuthTokens)
         {
-            if (oAuthTokens == null)
-            {
-                throw new ArgumentNullException(nameof(oAuthTokens));
-            }
-
-            tokens = oAuthTokens;
+            tokens = oAuthTokens ?? throw new ArgumentNullException(nameof(oAuthTokens));
             isInitialized = true;
 
             twitterDataProvider = null;
@@ -78,7 +73,7 @@ namespace pepeizq.Twitter
             {
                 if (!isInitialized)
                 {
-                    throw new InvalidOperationException("Provider not initialized.");
+                    throw new InvalidOperationException("Provider no inicializado.");
                 }
 
                 return twitterDataProvider ?? (twitterDataProvider = new TwitterDataProvider(tokens));

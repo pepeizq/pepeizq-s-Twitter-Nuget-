@@ -18,6 +18,9 @@ namespace pepeizq.Twitter
         [JsonProperty("profile_image_url_https")]
         public string ImagenAvatar { get; set; }
 
+        [JsonProperty ("profile_background_image_url_https")]
+        public string ImagenFondo { get; set; }
+
         [JsonProperty("verified")]
         public bool Verificado { get; set; }
 
