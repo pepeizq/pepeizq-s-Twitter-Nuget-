@@ -34,6 +34,8 @@ namespace pepeizq.Twitter.OAuth
 
         public OAuthParametro TokenSecret { get; private set; }
 
+        public OAuthParametro TokenCallback { get; private set; }
+
         public OAuthParametro Signature => new OAuthParametro("oauth_signature", GenerarFirma());
 
         public string AuthorizationHeader => GenerarCabeceraAutorizada();
@@ -65,6 +67,7 @@ namespace pepeizq.Twitter.OAuth
             ConsumerSecret = new OAuthParametro("oauth_consumer_secret", tokens.ConsumerSecret);
             Token = new OAuthParametro("oauth_token", tokens.AccessToken);
             TokenSecret = new OAuthParametro("oauth_token_secret", tokens.AccessTokenSecret);
+            TokenCallback = new OAuthParametro("oauth_callback", "https://pepeizqapps.com/");
         }
 
         private static Uri GetEncodedUri(Uri requestUri, IEnumerable<OAuthParametro> parametros)

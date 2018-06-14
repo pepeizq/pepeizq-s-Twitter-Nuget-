@@ -1,4 +1,4 @@
-﻿using Microsoft.Toolkit.Services;
+﻿using Microsoft.Toolkit.Parsers;
 using pepeizq.Twitter.Banner;
 using pepeizq.Twitter.Busqueda;
 using pepeizq.Twitter.OAuth;
@@ -54,10 +54,10 @@ namespace pepeizq.Twitter
                 CallbackUri = callbackUri
             };
 
-            return Initialize(oAuthTokens);
+            return Iniciar(oAuthTokens);
         }
 
-        public bool Initialize(TwitterOAuthTokens oAuthTokens)
+        public bool Iniciar(TwitterOAuthTokens oAuthTokens)
         {
             tokens = oAuthTokens ?? throw new ArgumentNullException(nameof(oAuthTokens));
             isInitialized = true;

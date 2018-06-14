@@ -1,4 +1,4 @@
-﻿using Microsoft.Toolkit.Services;
+﻿using Microsoft.Toolkit.Parsers;
 using Newtonsoft.Json;
 
 namespace pepeizq.Twitter.OEmbed
