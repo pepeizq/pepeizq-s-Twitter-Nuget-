@@ -142,6 +142,7 @@ namespace pepeizq.Twitter.OAuth
             yield return SignatureMethod;
             yield return ConsumerKey;
             yield return Token;
+            yield return TokenCallback;
         }
 
         private IEnumerable<OAuthParametro> GetAuthHeaderParameters()
@@ -152,6 +153,7 @@ namespace pepeizq.Twitter.OAuth
             yield return SignatureMethod;
             yield return ConsumerKey;
             yield return Token;
+            yield return TokenCallback;
         }
     }
 }
