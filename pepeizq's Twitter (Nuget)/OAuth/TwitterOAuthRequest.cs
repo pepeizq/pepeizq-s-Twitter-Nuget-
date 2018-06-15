@@ -10,7 +10,7 @@ using pepeizq.Twitter.Stream;
 
 namespace pepeizq.Twitter.OAuth
 {
-    internal class TwitterOAuthRequest
+    public class TwitterOAuthRequest
     {
         private static HttpClient cliente;
 

@@ -22,6 +22,7 @@ using Windows.Security.Cryptography;
 using Windows.Security.Cryptography.Core;
 using Windows.Storage;
 using Windows.Storage.Streams;
+using Windows.UI.Popups;
 
 namespace pepeizq.Twitter
 {
@@ -34,7 +35,7 @@ namespace pepeizq.Twitter
 
         private static HttpClient _client;
 
-        private readonly TwitterOAuthTokens _tokens;
+        public readonly TwitterOAuthTokens _tokens;
 
         private readonly PasswordVault boveda;
 
@@ -125,27 +126,27 @@ namespace pepeizq.Twitter
                 return true;
             }
 
-            if (await InitializeRequestAccessTokensAsync(_tokens.CallbackUri) == false)
+            if (await InitializeRequestAccessTokensAsync(_tokens.CallbackEnlace) == false)
             {
                 Logeado = false;
                 return false;
             }
 
             string requestToken = _tokens.RequestToken;
-            string twitterUrl = $"{OAuthBaseUrl}/authorize?oauth_token={requestToken}";
+            string twitterEnlace = $"{OAuthBaseUrl}/authorize?oauth_token={requestToken}";
 
-            Uri startUri = new Uri(twitterUrl);
-            Uri endUri = new Uri(_tokens.CallbackUri);
+            Uri startUri = new Uri(twitterEnlace);
+            Uri endUri = new Uri(_tokens.CallbackEnlace);
 
-            var result = await WebAuthenticationBroker.AuthenticateAsync(WebAuthenticationOptions.None, startUri, endUri);
+            var resultado = await WebAuthenticationBroker.AuthenticateAsync(WebAuthenticationOptions.None, startUri, endUri);
 
-            switch (result.ResponseStatus)
+            switch (resultado.ResponseStatus)
             {
                 case WebAuthenticationStatus.Success:
                     Logeado = true;
-                    return await ExchangeRequestTokenForAccessTokenAsync(result.ResponseData);
+                    return await ExchangeRequestTokenForAccessTokenAsync(resultado.ResponseData);
                 case WebAuthenticationStatus.ErrorHttp:
-                    Debug.WriteLine("WAB failed, message={0}", result.ResponseErrorDetail.ToString());
+                    Debug.WriteLine("WAB failed, message={0}", resultado.ResponseErrorDetail.ToString());
                     Logeado = false;
                     return false;
                 case WebAuthenticationStatus.UserCancel:
@@ -178,11 +179,10 @@ namespace pepeizq.Twitter
             try
             {
                 var usuarioScreenNombre = screenNombre ?? UsuarioScreenNombre;
-                var uri = new Uri($"{BaseUrl}/users/show.json?screen_name={usuarioScreenNombre}");
+                var enlace = new Uri($"{BaseUrl}/users/show.json?screen_name={usuarioScreenNombre}");
 
                 TwitterOAuthRequest request = new TwitterOAuthRequest();
-                rawResultado = await request.EjecutarGetAsync(uri, _tokens);
-
+                rawResultado = await request.EjecutarGetAsync(enlace, _tokens);
                 TwitterUsuario usuario = JsonConvert.DeserializeObject<TwitterUsuario>(rawResultado);
                 usuario.Tokens = _tokens;
                 return usuario;
@@ -400,8 +400,7 @@ namespace pepeizq.Twitter
             }
         }
 
-        public async Task<IEnumerable<TSchema>> BuscarUsuarios<TSchema>(TwitterOAuthTokens tokens, string screenNombre, IParser<TSchema> parser)
-        where TSchema : SchemaBase
+        public async Task<IEnumerable<TwitterUsuario>> BuscarUsuarios(TwitterOAuthTokens tokens, string screenNombre, TwitterBusquedaUsuariosParser parser)
         {
             try
             {
@@ -1081,19 +1080,19 @@ namespace pepeizq.Twitter
 
         private async Task<bool> InitializeRequestAccessTokensAsync(string twitterCallbackUrl)
         {
-            var twitterUrl = $"{OAuthBaseUrl}/request_token";
+            var twitterEnlace = $"{OAuthBaseUrl}/request_token";
 
             string nonce = GetNonce();
             string timeStamp = GetTimeStamp();
             string sigBaseStringParams = GetSignatureBaseStringParams(_tokens.ConsumerKey, nonce, timeStamp, "oauth_callback=" + Uri.EscapeDataString(twitterCallbackUrl));
-            string sigBaseString = "GET&" + Uri.EscapeDataString(twitterUrl) + "&" + Uri.EscapeDataString(sigBaseStringParams);
-            string signature = GetSignature(sigBaseString, _tokens.ConsumerSecret);
+            string sigBaseString = "GET&" + Uri.EscapeDataString(twitterEnlace) + "&" + Uri.EscapeDataString(sigBaseStringParams);
+            string firma = GetSignature(sigBaseString, _tokens.ConsumerSecret);
 
-            twitterUrl += "?" + sigBaseStringParams + "&oauth_signature=" + Uri.EscapeDataString(signature);
+            twitterEnlace += "?" + sigBaseStringParams + "&oauth_signature=" + Uri.EscapeDataString(firma);
 
             string getResponse;
 
-            using (var request = new HttpRequestMessage(HttpMethod.Get, new Uri(twitterUrl)))
+            using (var request = new HttpRequestMessage(HttpMethod.Get, new Uri(twitterEnlace)))
             {
                 using (var response = await _client.SendAsync(request).ConfigureAwait(false))
                 {

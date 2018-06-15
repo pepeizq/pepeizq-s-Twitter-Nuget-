@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
-using Microsoft.Toolkit.Parsers;
 using Newtonsoft.Json;
 
 namespace pepeizq.Twitter.Busqueda
 {
-    public class TwitterBusquedaUsuariosParser : IParser<TwitterUsuario>
+    public class TwitterBusquedaUsuariosParser 
     {
         public IEnumerable<TwitterUsuario> Parse(string data)
         {

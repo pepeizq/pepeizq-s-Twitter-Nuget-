@@ -1,19 +1,24 @@
-﻿using Microsoft.Toolkit.Parsers;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using pepeizq.Twitter.OAuth;
 
 namespace pepeizq.Twitter
 {
-    public class TwitterUsuario : SchemaBase, ITwitterResultado
+    public class TwitterUsuario 
     {
+        [JsonProperty("id")]
+        public string ID { get; set; }
+
         [JsonProperty("id_str")]
-        public string Id { get; set; }
+        public string ID_Str { get; set; }
 
         [JsonProperty("name")]
         public string Nombre { get; set; }
 
         [JsonProperty("screen_name")]
         public string ScreenNombre { get; set; }
+
+        [JsonProperty("description")]
+        public string Descripcion { get; set; }
 
         [JsonProperty("profile_image_url_https")]
         public string ImagenAvatar { get; set; }
@@ -62,9 +67,6 @@ namespace pepeizq.Twitter
 
         [JsonProperty("listed_count")]
         public string Listas { get; set; }
-
-        [JsonProperty("description")]
-        public string Descripcion { get; set; }
 
         [JsonProperty("url")]
         public string Enlace { get; set; }

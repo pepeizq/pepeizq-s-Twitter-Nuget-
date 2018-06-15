@@ -14,9 +14,9 @@ namespace pepeizq.Twitter
 {
     public class TwitterServicio
     {
-        private TwitterDataProvider twitterDataProvider;
+        public TwitterDataProvider twitterDataProvider;
 
-        private TwitterOAuthTokens tokens;
+        public TwitterOAuthTokens tokens;
 
         private bool isInitialized;
 
@@ -51,7 +51,7 @@ namespace pepeizq.Twitter
             {
                 ConsumerKey = consumerKey,
                 ConsumerSecret = consumerSecret,
-                CallbackUri = callbackUri
+                CallbackEnlace = callbackUri
             };
 
             return Iniciar(oAuthTokens);

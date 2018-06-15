@@ -14,6 +14,6 @@
 
         public string RequestTokenSecret { get; set; }
 
-        public string CallbackUri { get; set; }
+        public string CallbackEnlace { get; set; }
     }
 }
