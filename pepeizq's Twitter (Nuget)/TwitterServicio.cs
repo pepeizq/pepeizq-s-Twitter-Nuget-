@@ -139,38 +139,6 @@ namespace pepeizq.Twitter
 
         //--------------------------------------------
 
-        public async Task<TwitterUsuario> GenerarUsuario(string screenName = null)
-        {
-            if (Provider.Logeado)
-            {
-                return await Provider.GenerarUsuario(screenName);
-            }
-
-            var isLoggedIn = await Logear();
-            if (isLoggedIn)
-            {
-                return await GenerarUsuario(screenName);
-            }
-
-            return null;
-        }
-
-        public async Task<IEnumerable<Tweet.Tweet>> CogerTweetsTimelineInicio(TwitterOAuthTokens tokens, string ultimoTweet)
-        {
-            if (Provider.Logeado)
-            {
-                return await Provider.CogerTweetsTimelineInicio(tokens,ultimoTweet, new TweetParser());
-            }
-
-            var isLoggedIn = await Logear();
-            if (isLoggedIn)
-            {
-                return await CogerTweetsTimelineInicio(tokens,ultimoTweet);
-            }
-
-            return null;
-        }
-
         public async Task<IEnumerable<Tweet.Tweet>> CogerTweetsTimelineMenciones(TwitterOAuthTokens tokens, string ultimoTweet)
         {
             if (Provider.Logeado)

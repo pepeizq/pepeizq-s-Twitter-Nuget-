@@ -172,92 +172,7 @@ namespace pepeizq.Twitter
         }
 
         //--------------------------------------------
-
-        public async Task<TwitterUsuario> GenerarUsuario(string screenNombre = null)
-        {
-            string rawResultado = null;
-            try
-            {
-                var usuarioScreenNombre = screenNombre ?? UsuarioScreenNombre;
-                var enlace = new Uri($"{BaseUrl}/users/show.json?screen_name={usuarioScreenNombre}");
-
-                TwitterOAuthRequest request = new TwitterOAuthRequest();
-                rawResultado = await request.EjecutarGetAsync(enlace, _tokens);
-                TwitterUsuario usuario = JsonConvert.DeserializeObject<TwitterUsuario>(rawResultado);
-                usuario.Tokens = _tokens;
-                return usuario;
-            }
-            catch (WebException wex)
-            {
-                if (wex.Response is HttpWebResponse response)
-                {
-                    if (response.StatusCode == HttpStatusCode.NotFound)
-                    {
-                        throw new UserNotFoundException(screenNombre);
-                    }
-
-                    if ((int)response.StatusCode == 429)
-                    {
-                        throw new TooManyRequestsException();
-                    }
-
-                    if (response.StatusCode == HttpStatusCode.Unauthorized)
-                    {
-                        throw new OAuthKeysRevokedException();
-                    }
-                }
-
-                throw;
-            }
-            catch
-            {
-                if (!string.IsNullOrEmpty(rawResultado))
-                {
-                    var errores = JsonConvert.DeserializeObject<TwitterErrores>(rawResultado);
-
-                    throw new TwitterExcepcion { Errores = errores };
-                }
-
-                throw;
-            }
-        }
-
-        public async Task<IEnumerable<TSchema>> CogerTweetsTimelineInicio<TSchema>(TwitterOAuthTokens tokens, string ultimoTweet, IParser<TSchema> parser)
-        where TSchema : SchemaBase
-        {
-            try
-            {
-                if (ultimoTweet != null)
-                {
-                    ultimoTweet = "&max_id=" + ultimoTweet;
-                }
-
-                var uri = new Uri($"{BaseUrl}/statuses/home_timeline.json?tweet_mode=extended{ultimoTweet}");
-
-                TwitterOAuthRequest request = new TwitterOAuthRequest();
-                var rawResultado = await request.EjecutarGetAsync(uri, tokens);
-
-                return parser.Parse(rawResultado);
-            }
-            catch (WebException wex)
-            {
-                if (wex.Response is HttpWebResponse response)
-                {
-                    if ((int)response.StatusCode == 429)
-                    {
-                        throw new TooManyRequestsException();
-                    }
-
-                    if (response.StatusCode == HttpStatusCode.Unauthorized)
-                    {
-                        throw new OAuthKeysRevokedException();
-                    }
-                }
-
-                throw;
-            }
-        }
-
+     
         public async Task<IEnumerable<TSchema>> CogerTweetsTimelineMenciones<TSchema>(TwitterOAuthTokens tokens, string ultimoTweet, IParser<TSchema> parser)
         where TSchema : SchemaBase
         {
@@ -966,7 +881,7 @@ namespace pepeizq.Twitter
                     items = await GetCustomSearch(config.Query, parser);
                     break;
                 default:
-                    items = await CogerTweetsTimelineInicio(null,null, parser);
+                    items = null;
                     break;
             }
 
