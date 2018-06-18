@@ -71,8 +71,6 @@ namespace pepeizq.Twitter
         [JsonProperty("url")]
         public string Enlace { get; set; }
 
-        public TwitterOAuthTokens Tokens { get; set; }
-
         [JsonProperty("entities")]
         public Tweet.TweetEntidadUsuario Entidades { get; set; }
     }

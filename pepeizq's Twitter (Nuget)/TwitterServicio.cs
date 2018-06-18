@@ -3,7 +3,6 @@ using pepeizq.Twitter.Banner;
 using pepeizq.Twitter.Busqueda;
 using pepeizq.Twitter.OAuth;
 using pepeizq.Twitter.OEmbed;
-using pepeizq.Twitter.Stream;
 using pepeizq.Twitter.Tweet;
 using System;
 using System.Collections.Generic;
@@ -138,38 +137,6 @@ namespace pepeizq.Twitter
         }
 
         //--------------------------------------------
-
-        public async Task<IEnumerable<Tweet.Tweet>> CogerTweetsTimelineMenciones(TwitterOAuthTokens tokens, string ultimoTweet)
-        {
-            if (Provider.Logeado)
-            {
-                return await Provider.CogerTweetsTimelineMenciones(tokens,ultimoTweet, new TweetParser());
-            }
-
-            var isLoggedIn = await Logear();
-            if (isLoggedIn)
-            {
-                return await CogerTweetsTimelineMenciones(tokens,ultimoTweet);
-            }
-
-            return null;
-        }
-
-        public async Task<IEnumerable<Tweet.Tweet>> CogerTweetsTimelineUsuario(string screenNombre, string ultimoTweet)
-        {
-            if (Provider.Logeado)
-            {
-                return await Provider.CogerTweetsTimelineUsuario(screenNombre, ultimoTweet, new TweetParser());
-            }
-
-            var isLoggedIn = await Logear();
-            if (isLoggedIn)
-            {
-                return await CogerTweetsTimelineUsuario(screenNombre, ultimoTweet);
-            }
-
-            return null;
-        }
 
         public async Task<Tweet.Tweet> CogerTweet(TwitterOAuthTokens tokens, string idTweet)
         {
@@ -452,25 +419,6 @@ namespace pepeizq.Twitter
 
             return false;
         }
-
-        public async Task ArrancarStreamUsuario(TwitterOAuthTokens tokens, TwitterStreamLlamadas.TwitterStreamLlamada llamada)
-        {
-            if (Provider.Logeado)
-            {
-                await Provider.ArrancarStreamUsuario(tokens,new TwitterUsuarioStreamParser(), llamada);
-                return;
-            }
-
-            var isLoggedIn = await Logear();
-            if (isLoggedIn)
-            {
-                await ArrancarStreamUsuario(tokens,llamada);
-            }
-        }
-
-        public void PararStreamUsuario()
-        {
-            Provider.PararStreamUsuario();
-        }
+    
     }
 }

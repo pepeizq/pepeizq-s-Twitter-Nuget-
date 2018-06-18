@@ -172,82 +172,7 @@ namespace pepeizq.Twitter
         }
 
         //--------------------------------------------
-     
-        public async Task<IEnumerable<TSchema>> CogerTweetsTimelineMenciones<TSchema>(TwitterOAuthTokens tokens, string ultimoTweet, IParser<TSchema> parser)
-        where TSchema : SchemaBase
-        {
-            try
-            {
-                if (ultimoTweet != null)
-                {
-                    ultimoTweet = "&max_id=" + ultimoTweet;
-                }
-
-                var uri = new Uri($"{BaseUrl}/statuses/mentions_timeline.json?tweet_mode=extended{ultimoTweet}");
-
-                TwitterOAuthRequest request = new TwitterOAuthRequest();
-                var rawResultado = await request.EjecutarGetAsync(uri, tokens);
-
-                return parser.Parse(rawResultado);
-            }
-            catch (WebException wex)
-            {
-                if (wex.Response is HttpWebResponse response)
-                {
-                    if ((int)response.StatusCode == 429)
-                    {
-                        throw new TooManyRequestsException();
-                    }
-
-                    if (response.StatusCode == HttpStatusCode.Unauthorized)
-                    {
-                        throw new OAuthKeysRevokedException();
-                    }
-                }
-
-                throw;
-            }
-        }
-
-        public async Task<IEnumerable<TSchema>> CogerTweetsTimelineUsuario<TSchema>(string screenNombre, string ultimoTweet, IParser<TSchema> parser)
-        where TSchema : SchemaBase
-        {
-            try
-            {
-                if (ultimoTweet != null)
-                {
-                    ultimoTweet = "&max_id=" + ultimoTweet;
-                }
-
-                var uri = new Uri($"{BaseUrl}/statuses/user_timeline.json?screen_name={screenNombre}&tweet_mode=extended&include_rts=1{ultimoTweet}");
-
-                TwitterOAuthRequest request = new TwitterOAuthRequest();
-
-                string rawResultado = null;
-                rawResultado = await request.EjecutarGetAsync(uri, _tokens);
-
-                var resultado = parser.Parse(rawResultado);
-                return resultado.Take(20).ToList();
-            }
-            catch (WebException wex)
-            {
-                if (wex.Response is HttpWebResponse response)
-                {
-                    if ((int)response.StatusCode == 429)
-                    {
-                        throw new TooManyRequestsException();
-                    }
-
-                    if (response.StatusCode == HttpStatusCode.Unauthorized)
-                    {
-                        throw new OAuthKeysRevokedException();
-                    }
-                }
-
-                throw;
-            }
-        }
-
+    
         public async Task<Tweet.Tweet> CogerTweet(TwitterOAuthTokens tokens, string idTweet, TweetParserIndividual parser)
         {
             try
@@ -806,41 +731,6 @@ namespace pepeizq.Twitter
 
                 throw;
             }
-        }
-
-        public Task ArrancarStreamUsuario(TwitterOAuthTokens tokens, TwitterUsuarioStreamParser parser, TwitterStreamLlamadas.TwitterStreamLlamada llamada)
-        {
-            try
-            {
-                var uri = new Uri($"{UserStreamUrl}/user.json?replies=all");
-
-                _streamRequest = new TwitterOAuthRequest();
-
-                return _streamRequest.EjecutarGetStreamAsync(uri, tokens, rawResult => llamada(parser.Parse(rawResult)));
-            }
-            catch (WebException wex)
-            {
-                if (wex.Response is HttpWebResponse response)
-                {
-                    if ((int)response.StatusCode == 429)
-                    {
-                        throw new TooManyRequestsException();
-                    }
-
-                    if (response.StatusCode == HttpStatusCode.Unauthorized)
-                    {
-                        throw new OAuthKeysRevokedException();
-                    }
-                }
-
-                throw;
-            }
-        }
-
-        public void PararStreamUsuario()
-        {
-            _streamRequest?.Abortar();
-            _streamRequest = null;
         }
     
         //--------------------------------------------
