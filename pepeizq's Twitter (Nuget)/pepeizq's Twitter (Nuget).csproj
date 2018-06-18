@@ -149,8 +149,6 @@
     <Compile Include="TwitterMensajeDirecto.cs" />
     <Compile Include="TwitterParser.cs" />
     <Compile Include="TwitterQueryTipo.cs" />
-    <Compile Include="Busqueda\TwitterBusquedaTweetsParser.cs" />
-    <Compile Include="Busqueda\TwitterBusquedaTweetsResultado.cs" />
     <Compile Include="TwitterServicio.cs" />
     <Compile Include="TwitterStatus.cs" />
     <Compile Include="TwitterUsuario.cs" />

@@ -12,7 +12,10 @@ namespace pepeizq.Twitter.Tweet
         public string ID { get; set; }
 
         [JsonProperty("full_text")]
-        public string Texto { get; set; }
+        public string TextoCompleto { get; set; }
+
+        [JsonProperty("text")]
+        public string TextoParcial { get; set; }
 
         [JsonProperty("user")]
         public TwitterUsuario Usuario { get; set; }

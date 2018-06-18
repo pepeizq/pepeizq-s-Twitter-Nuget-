@@ -9,12 +9,10 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Microsoft.Toolkit.Parsers;
 using Microsoft.Toolkit.Services;
-using Newtonsoft.Json;
 using pepeizq.Twitter.Banner;
 using pepeizq.Twitter.Busqueda;
 using pepeizq.Twitter.OAuth;
 using pepeizq.Twitter.OEmbed;
-using pepeizq.Twitter.Stream;
 using pepeizq.Twitter.Tweet;
 using Windows.Security.Authentication.Web;
 using Windows.Security.Credentials;
@@ -38,8 +36,6 @@ namespace pepeizq.Twitter
         public readonly TwitterOAuthTokens _tokens;
 
         private readonly PasswordVault boveda;
-
-        private TwitterOAuthRequest _streamRequest;
 
         public string UsuarioScreenNombre { get; set; }
 
@@ -172,74 +168,7 @@ namespace pepeizq.Twitter
         }
 
         //--------------------------------------------
-    
-        public async Task<Tweet.Tweet> CogerTweet(TwitterOAuthTokens tokens, string idTweet, TweetParserIndividual parser)
-        {
-            try
-            {
-                var uri = new Uri($"{BaseUrl}/statuses/show.json?id={idTweet}&tweet_mode=extended");
-
-                TwitterOAuthRequest request = new TwitterOAuthRequest();
-
-                string rawResultado = null;
-                rawResultado = await request.EjecutarGetAsync(uri, tokens);
-
-                var resultado = parser.Parse(rawResultado);
-                return resultado;
-            }
-            catch (WebException wex)
-            {
-                if (wex.Response is HttpWebResponse response)
-                {
-                    if ((int)response.StatusCode == 429)
-                    {
-                        throw new TooManyRequestsException();
-                    }
-
-                    if (response.StatusCode == HttpStatusCode.Unauthorized)
-                    {
-                        throw new OAuthKeysRevokedException();
-                    }
-                }
-
-                throw;
-            }
-        }
-
-        public async Task<IEnumerable<TSchema>> BuscarRespuestasTweet<TSchema>(TwitterOAuthTokens tokens, string screenNombre, string tweetID, IParser<TSchema> parser)
-        where TSchema : SchemaBase
-        {
-            try
-            {
-                var uri = new Uri($"{BaseUrl}/search/tweets.json?q=%40{screenNombre}&since_id={tweetID}&result_type=recent&count=100&tweet_mode=extended");
-
-                TwitterOAuthRequest request = new TwitterOAuthRequest();
-
-                string rawResultado = null;
-                rawResultado = await request.EjecutarGetAsync(uri, tokens);
-
-                var resultado = parser.Parse(rawResultado);
-                return resultado.Take(100).ToList();
-            }
-            catch (WebException wex)
-            {
-                if (wex.Response is HttpWebResponse response)
-                {
-                    if ((int)response.StatusCode == 429)
-                    {
-                        throw new TooManyRequestsException();
-                    }
-
-                    if (response.StatusCode == HttpStatusCode.Unauthorized)
-                    {
-                        throw new OAuthKeysRevokedException();
-                    }
-                }
-
-                throw;
-            }
-        }
-
+   
         public async Task<IEnumerable<TwitterUsuario>> BuscarUsuarios(TwitterOAuthTokens tokens, string screenNombre, TwitterBusquedaUsuariosParser parser)
         {
             try
@@ -745,7 +674,6 @@ namespace pepeizq.Twitter
             switch (config.QueryTipo)
             {
                 case TwitterQueryTipo.Busqueda:
-                    return new TwitterBusquedaTweetsParser();
                 case TwitterQueryTipo.Inicio:
                 case TwitterQueryTipo.Usuario:
                 case TwitterQueryTipo.Banner:

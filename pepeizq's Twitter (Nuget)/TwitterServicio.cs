@@ -77,23 +77,7 @@ namespace pepeizq.Twitter
 
                 return twitterDataProvider ?? (twitterDataProvider = new TwitterDataProvider(tokens));
             }
-        }
-
-        public async Task<IEnumerable<Tweet.Tweet>> SearchAsync(string hashTag, int maxRecords = 20)
-        {
-            if (Provider.Logeado)
-            {
-                return await Provider.SearchAsync(hashTag, maxRecords, new TwitterBusquedaTweetsParser());
-            }
-
-            var isLoggedIn = await Logear();
-            if (isLoggedIn)
-            {
-                return await SearchAsync(hashTag, maxRecords);
-            }
-
-            return null;
-        }
+        }   
 
         public async Task<List<Tweet.Tweet>> RequestAsync(TwitterDataConfig config, int maxRecords = 20)
         {
@@ -137,38 +121,6 @@ namespace pepeizq.Twitter
         }
 
         //--------------------------------------------
-
-        public async Task<Tweet.Tweet> CogerTweet(TwitterOAuthTokens tokens, string idTweet)
-        {
-            if (Provider.Logeado)
-            {
-                return await Provider.CogerTweet(tokens, idTweet, new TweetParserIndividual());
-            }
-
-            var isLoggedIn = await Logear();
-            if (isLoggedIn)
-            {
-                return await CogerTweet(tokens, idTweet);
-            }
-
-            return null;
-        }
-
-        public async Task<IEnumerable<Tweet.Tweet>> BuscarRespuestasTweet(TwitterOAuthTokens tokens, string screenNombre, string tweetID)
-        {
-            if (Provider.Logeado)
-            {
-                return await Provider.BuscarRespuestasTweet(tokens, screenNombre, tweetID, new TwitterBusquedaTweetsParser());
-            }
-
-            var isLoggedIn = await Logear();
-            if (isLoggedIn)
-            {
-                return await BuscarRespuestasTweet(tokens, screenNombre, tweetID);
-            }
-
-            return null;
-        }
 
         public async Task<IEnumerable<TwitterUsuario>> BuscarUsuarios(TwitterOAuthTokens tokens, string screenNombre)
         {
