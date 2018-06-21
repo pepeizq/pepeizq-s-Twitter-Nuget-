@@ -106,12 +106,6 @@
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Banner\Banner.cs" />
-    <Compile Include="Banner\BannerImagen.cs" />
-    <Compile Include="Banner\BannerParser.cs" />
-    <Compile Include="Banner\BannerTamaño.cs" />
-    <Compile Include="Busqueda\TwitterBusquedaUsuariosParser.cs" />
-    <Compile Include="Busqueda\TwitterBusquedaUsuariosResultado.cs" />
     <Compile Include="ITwitterResultado.cs" />
     <Compile Include="OAuth\OAuthEncoder.cs" />
     <Compile Include="OAuth\OAuthParametro.cs" />
@@ -120,8 +114,6 @@
     <Compile Include="OAuth\TwitterOAuthRequestConstructor.cs" />
     <Compile Include="OAuth\TwitterOAuthTokens.cs" />
     <Compile Include="OAuth\TwitterOAuthTokenTipo.cs" />
-    <Compile Include="OEmbed\OEmbed.cs" />
-    <Compile Include="OEmbed\OEmbedParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Stream\TwitterStreamEvento.cs" />
     <Compile Include="Stream\TwitterStreamEventoBorrar.cs" />
@@ -150,7 +142,6 @@
     <Compile Include="TwitterParser.cs" />
     <Compile Include="TwitterQueryTipo.cs" />
     <Compile Include="TwitterServicio.cs" />
-    <Compile Include="TwitterStatus.cs" />
     <Compile Include="TwitterUsuario.cs" />
     <EmbeddedResource Include="Properties\pepeizq_s_Twitter__Nuget_.rd.xml" />
   </ItemGroup>

@@ -92,7 +92,7 @@ namespace pepeizq.Twitter.OAuth
             }
         }
 
-        public async Task<string> ExecutePostMultipartAsync(Uri requestUri, TwitterOAuthTokens tokens, string boundary, byte[] content)
+        public async Task<string> EjecutarPostMultipartAsync(Uri requestUri, TwitterOAuthTokens tokens, string boundary, byte[] content)
         {
             JToken mediaId = null;
 

@@ -20,8 +20,10 @@ namespace pepeizq.Twitter
             }
             catch (JsonSerializationException)
             {
-                List<T> items = new List<T>();
-                items.Add(JsonConvert.DeserializeObject<T>(data));
+                List<T> items = new List<T>
+                {
+                    JsonConvert.DeserializeObject<T>(data)
+                };
                 return items;
             }
         }
